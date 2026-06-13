@@ -1,0 +1,11 @@
+# Whitelist approach: ignore everything in the root by default
+/*
+
+# Allow these specific files and directories
+!/.gitignore
+!/index.html
+!/README.md
+!/scripts/
+
+# Ensure all contents of scripts/ are allowed
+!/scripts/**

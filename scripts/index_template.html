@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>301W53 // Condo Board Executive Hub</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #111827;
+            --surface-card: #1f2937;
+            --surface-hover: #374151;
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.15);
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- PASSWORD GATE --- */
+        #passwordGate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #090514 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .login-card {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3rem 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-card h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 40%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .password-input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .password-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            color: var(--text);
+            font-size: 1.1rem;
+            text-align: center;
+            letter-spacing: 0.2em;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .password-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        #dashboardLayout {
+            display: none; /* revealed after auth */
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #f9fafb 30%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .last-synced-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .last-synced-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .sync-btn {
+            background: var(--primary-glow);
+            border: 1px solid var(--primary-light);
+            color: var(--primary-light);
+            padding: 0.5rem 1.25rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .sync-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Tabs Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background: var(--primary-glow);
+            box-shadow: inset 0 0 0 1px var(--primary-light);
+        }
+
+        /* --- CONTENT CONTAINERS --- */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid layouts */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card panels */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Metrics cards */
+        .metric-card {
+            background: linear-gradient(145deg, var(--surface) 0%, rgba(31, 41, 55, 0.5) 100%);
+            border-left: 4px solid var(--primary-light);
+        }
+
+        .metric-card.success { border-left-color: var(--success); }
+        .metric-card.danger { border-left-color: var(--danger); }
+        .metric-card.warning { border-left-color: var(--warning); }
+
+        .metric-card h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-card .value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.25rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .metric-card.success .value { color: var(--success); }
+        .metric-card.danger .value { color: var(--danger); }
+        .metric-card.warning .value { color: var(--warning); }
+
+        .metric-card .subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Banners / Callouts */
+        .banner {
+            display: flex;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .banner:hover {
+            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .banner-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .banner-content h5 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: white;
+        }
+
+        .banner-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Progress bars */
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.05);
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
+            transition: width 1s ease-out;
+        }
+
+        /* Tables styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .fancy-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .fancy-table th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .fancy-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            color: #d1d5db;
+        }
+
+        .fancy-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .fancy-table tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+            color: white;
+        }
+
+        .currency {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            color: white;
+        }
+
+        .currency.neg {
+            color: var(--danger);
+        }
+
+        .currency.pos {
+            color: var(--success);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border: 1px solid transparent;
+        }
+
+        .badge.primary { background: var(--primary-glow); color: var(--primary-light); border-color: rgba(79, 70, 229, 0.3); }
+        .badge.success { background: var(--success-glow); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .badge.danger { background: var(--danger-glow); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .badge.warning { background: var(--warning-glow); color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
+        .badge.muted { background: rgba(255, 255, 255, 0.03); color: var(--text-muted); border-color: var(--border); }
+
+        /* Search & filters */
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            flex: 2;
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .filter-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .filter-select {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-light);
+        }
+
+        /* --- UPDATE MODAL / TERMINAL --- */
+        #updateModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #updateModal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .terminal-card {
+            background: #090c15;
+            border: 1px solid #1f2937;
+            width: 100%;
+            max-width: 680px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            animation: terminalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes terminalPop {
+            from { transform: scale(0.95) translateY(10px); }
+            to { transform: scale(1) translateY(0); }
+        }
+
+        .terminal-header {
+            background: #111827;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.r { background: #ef4444; }
+        .terminal-dot.y { background: #f59e0b; }
+        .terminal-dot.g { background: #10b981; }
+
+        .terminal-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: var(--transition);
+        }
+
+        .terminal-close:hover {
+            color: white;
+        }
+
+        .terminal-body {
+            background: #05070d;
+            padding: 1.5rem;
+            height: 340px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #10b981;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .terminal-line.cmd { color: #f9fafb; font-weight: 600; }
+        .terminal-line.info { color: #3b82f6; }
+        .terminal-line.warn { color: #eab308; }
+        .terminal-line.success { color: #10b981; }
+        .terminal-line.system { color: #8b5cf6; }
+
+        .terminal-footer {
+            background: #111827;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #1f2937;
+            gap: 1rem;
+        }
+
+        .terminal-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .terminal-btn.cancel {
+            background: #374151;
+            color: #d1d5db;
+        }
+
+        .terminal-btn.cancel:hover { background: #4b5563; }
+
+        .terminal-btn.run {
+            background: var(--primary);
+            color: white;
+        }
+
+        .terminal-btn.run:hover { background: var(--primary-light); }
+
+        /* Document table styling */
+        .doc-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .doc-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Timeline list */
+        .timeline-list {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1rem;
+        }
+
+        .timeline-list::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 5px;
+            width: 2px;
+            height: 100%;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: -29px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            box-shadow: 0 0 6px var(--primary-light);
+        }
+
+        .timeline-item.active::before {
+            background: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+
+        .timeline-item h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Pagination & totals info */
+        .table-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.75rem;
+        }
+
+        .table-btn-sm {
+            background: var(--border);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .table-btn-sm:hover {
+            background: var(--surface-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PASSWORD GATE -->
+    <div id="passwordGate">
+        <div class="login-card">
+            <div class="login-logo">🏛️</div>
+            <h2>301W53 Residential Board</h2>
+            <p>Access is restricted to board members. Please enter password.</p>
+            <div class="password-input-group">
+                <input type="password" id="boardPassword" class="password-input" placeholder="••••••••" onkeydown="if(event.key === 'Enter') checkPassword()">
+            </div>
+            <button onclick="checkPassword()" class="login-btn">Unlock Portal</button>
+            <div id="passwordError" class="error-message">Access Denied: Incorrect Password</div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardLayout">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-title">
+                <h1>301 West 53rd Street</h1>
+                <p>Consolidated Condo Board Strategy & Operations Hub</p>
+            </div>
+            <div class="header-actions">
+                <div class="last-synced-badge">
+                    <span class="last-synced-dot"></span>
+                    <span>System Updated: <strong id="lastUpdatedVal">2026-06-13 11:00 AM</strong></span>
+                </div>
+                <button class="sync-btn" onclick="openSyncModal()">
+                    🔄 Update Dashboard
+                </button>
+            </div>
+        </div>
+
+        <!-- TABS BAR -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('summary', this)">🏛️ Executive Summary</button>
+            <button class="tab-btn" onclick="switchTab('finance', this)">📊 Financial Hub</button>
+            <button class="tab-btn" onclick="switchTab('roof', this)">🏗️ Roof & Terrace Project</button>
+            <button class="tab-btn" onclick="switchTab('admin', this)">📋 Admin & Meetings</button>
+            <button class="tab-btn" onclick="switchTab('documents', this)">📂 Authoritative Document Index</button>
+        </div>
+
+        <!-- TAB: EXECUTIVE SUMMARY -->
+        <div id="summary" class="tab-content active">
+            <div class="grid-3">
+                <div class="card metric-card danger">
+                    <h4>Annual Operating Deficit</h4>
+                    <div class="value">$471,735</div>
+                    <div class="subtitle">Operating run-rate deficit projected for FY 2026</div>
+                </div>
+                <div class="card metric-card success">
+                    <h4>Capital Reserve Levy</h4>
+                    <div class="value">$3,111,122</div>
+                    <div class="subtitle">Approved special assessment for envelope & roof upgrades</div>
+                </div>
+                <div class="card metric-card warning">
+                    <h4>Major Project Status</h4>
+                    <div class="value">92%</div>
+                    <div class="subtitle">Roof replacement project timeline milestone progress</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>📢 Key Board Announcements & Highlights</h3>
+                    <div style="margin-top: 1rem;">
+                        <div class="banner">
+                            <div class="banner-icon">🏗️</div>
+                            <div class="banner-content">
+                                <h5>Sidewalk Sheds Completely Disassembled!</h5>
+                                <p>Scaffolding and sheds on both 8th Avenue and 54th Street have been removed. This restores street frontage and natural light to the building stores and entrance!</p>
+                            </div>
+                        </div>
+                        <div class="banner">
+                            <div class="banner-icon">🗳️</div>
+                            <div class="banner-content">
+                                <h5>Summer 2026 Resident Survey Live!</h5>
+                                <p>We've launched the Resident Feedback & Engagement Survey. Residents are providing input on building upgrades, volunteer committees, and communication formats. <a href="https://docs.google.com/forms/d/e/1FAIpQLSeBrZoPHd-oHFPN2hxOx5UwI-Wlya2aCiv0wXtrWVaYAPLgsQ/viewform" target="_blank" style="color:var(--primary-light);">Take Survey here</a></p>
+                            </div>
+                        </div>
+                        <div class="banner">
+                            <div class="banner-icon">💰</div>
+                            <div class="banner-content">
+                                <h5>$250 Goodwill Utility Credit Finalized</h5>
+                                <p>25th-floor residents facing electric bill spikes due to temporary heating outages during roof insulation works will receive a $250 credit per unit.</p>
+                            </div>
+                        </div>
+                        <div class="banner">
+                            <div class="banner-icon">👥</div>
+                            <div class="banner-content">
+                                <h5>New Board Members Onboarded</h5>
+                                <p>A warm welcome to Kate Pollan and Michelle Kim who joined the Board of Managers earlier this fiscal year!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🛠️ Quick Operational Status Matrix</h3>
+                    <div style="margin-top: 1rem;">
+                        <div class="table-container">
+                            <table class="fancy-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project / Item</th>
+                                        <th>Vendor / Lead</th>
+                                        <th>Budget</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Roof Construction</strong></td>
+                                        <td>Nova / Rand</td>
+                                        <td class="currency">$1,650,000</td>
+                                        <td><span class="badge success">Waterproofing</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Landscape Design</strong></td>
+                                        <td>BR Design / Richard</td>
+                                        <td class="currency">$1,781,500</td>
+                                        <td><span class="badge warning">GC Bidding</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Security Camera Upgrades</strong></td>
+                                        <td>POM Security Proposal</td>
+                                        <td class="currency">$10,000/yr</td>
+                                        <td><span class="badge primary">Under Review</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Boiler Coil Repair</strong></td>
+                                        <td>Energo / Rand</td>
+                                        <td class="currency">$600,000</td>
+                                        <td><span class="badge muted">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sidewalk Concrete Repair</strong></td>
+                                        <td>Nova Proposal</td>
+                                        <td class="currency">$31,680</td>
+                                        <td><span class="badge danger">No Warranty</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Annual Oil Tank Testing</strong></td>
+                                        <td>Nicholas Pisco / Riteway</td>
+                                        <td class="currency">Operating</td>
+                                        <td><span class="badge success">Passed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FINANCIAL HUB -->
+        <div id="finance" class="tab-content">
+            <div class="filter-row" style="margin-bottom: 1.5rem; justify-content: flex-end; align-items: center; gap: 0.5rem; width: 100%;">
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-right: 0.5rem;">📅 Date Range:</span>
+                <button class="badge primary" onclick="setChartFilter('2026-YTD', this)" style="cursor: pointer; font-size: 0.8rem; padding: 0.4rem 0.8rem; outline: none; background: var(--primary-glow); color: var(--primary-light); border: 1px solid var(--primary-light);">2026 YTD</button>
+                <button class="badge muted" onclick="setChartFilter('2025', this)" style="cursor: pointer; font-size: 0.8rem; padding: 0.4rem 0.8rem; outline: none; background: rgba(255,255,255,0.03); color: var(--text-muted); border: 1px solid var(--border);">2025 Full</button>
+                <button class="badge muted" onclick="setChartFilter('2024', this)" style="cursor: pointer; font-size: 0.8rem; padding: 0.4rem 0.8rem; outline: none; background: rgba(255,255,255,0.03); color: var(--text-muted); border: 1px solid var(--border);">2024 Full</button>
+                <button class="badge muted" onclick="setChartFilter('all', this)" style="cursor: pointer; font-size: 0.8rem; padding: 0.4rem 0.8rem; outline: none; background: rgba(255,255,255,0.03); color: var(--text-muted); border: 1px solid var(--border);">All Time</button>
+            </div>
+            <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); margin-bottom: 2rem;">
+                <div class="card" style="height: 380px;">
+                    <h3>📊 Deficit Gap Analysis</h3>
+                    <div style="height: 280px; margin-top: 1rem; position: relative;">
+                        <canvas id="chartDeficit"></canvas>
+                    </div>
+                </div>
+                <div class="card" style="height: 380px;">
+                    <h3>🍕 Expense Share Allocation (2026)</h3>
+                    <div style="height: 280px; margin-top: 1rem; position: relative;">
+                        <canvas id="chartShares"></canvas>
+                    </div>
+                </div>
+                <div class="card" style="height: 380px;">
+                    <h3>📈 Seasonal Spend Trends (Monthly)</h3>
+                    <div style="height: 280px; margin-top: 1rem; position: relative;">
+                        <canvas id="chartTrends"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORENSIC AUDIT DISCREPANCIES -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3>🛡️ Forensic Statement Reconciliation Findings</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.25rem; margin-bottom:1rem;">Comparison of Gumley-Haft ledger balances against physical bank statement PDFs (Top audit variance leaks detected):</p>
+                <div class="table-container">
+                    <table class="fancy-table">
+                        <thead>
+                            <tr>
+                                <th>Statement Period</th>
+                                <th>Ledger Balance</th>
+                                <th>PDF Statement Bal</th>
+                                <th>Unrecorded Discrepancy</th>
+                                <th>Identified Variance Source Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>July 2025</td>
+                                <td class="currency">$3,063,960.35</td>
+                                <td class="currency">$3,064,818.05</td>
+                                <td class="currency pos">+$857.70</td>
+                                <td><span class="badge danger">Unrecorded payment</span> to The Fresh Air Company</td>
+                            </tr>
+                            <tr>
+                                <td>May 2025</td>
+                                <td class="currency">$178,247.44</td>
+                                <td class="currency">$181,399.32</td>
+                                <td class="currency pos">+$3,151.88</td>
+                                <td><span class="badge danger">Unrecorded payment</span> to The Fresh Air Company</td>
+                            </tr>
+                            <tr>
+                                <td>April 2025</td>
+                                <td class="currency">$126,624.12</td>
+                                <td class="currency">$181,399.32</td>
+                                <td class="currency pos">+$1,500.00</td>
+                                <td><span class="badge warning">Unrecorded payment</span> to NYC Department of Finance</td>
+                            </tr>
+                            <tr>
+                                <td>August 2024</td>
+                                <td class="currency">$153,798.54</td>
+                                <td class="currency">$158,952.31</td>
+                                <td class="currency pos">+$5,153.77</td>
+                                <td><span class="badge danger">Multiple unrecorded:</span> Fresh Air Co ($5k) + Coffee Distributers ($154)</td>
+                            </tr>
+                            <tr>
+                                <td>July 2024</td>
+                                <td class="currency">$149,048.51</td>
+                                <td class="currency">$152,078.72</td>
+                                <td class="currency pos">+$3,030.21</td>
+                                <td><span class="badge danger">Unrecorded payments:</span> Fresh Air Co ($2.6k) + Coffee Distributers ($367)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RAW TRANSACTIONS SEARCH -->
+            <div class="card">
+                <div class="card-title-row">
+                    <h3>🗄️ Authoritative General Ledger Search Engine</h3>
+                    <div style="font-size:0.8rem; color:var(--text-muted)">
+                        Total Audited Records: <strong id="totalCount">0</strong> | Matches: <strong id="recordCount">0</strong>
+                    </div>
+                </div>
+                
+                <div class="filter-row">
+                    <input type="text" id="ledgerSearch" class="filter-input" placeholder="Search by vendor, description, check number..." oninput="filterLedger()">
+                    <select id="ledgerCategory" class="filter-select" onchange="filterLedger()">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select id="ledgerYear" class="filter-select" onchange="filterLedger()">
+                        <option value="">All Years</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="fancy-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vendor Name</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Description / Remarks</th>
+                                <th>Check No</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgerTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-meta-row">
+                    <span id="sumText">Total Spend for matches: <strong id="sumValue" class="currency">$0.00</strong></span>
+                    <div>
+                        <button class="table-btn-sm" id="prevBtn" onclick="prevPage()">Prev</button>
+                        <span id="pageInfo" style="margin:0 0.5rem;">Page 1 of 1</span>
+                        <button class="table-btn-sm" id="nextBtn" onclick="nextPage()">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ROOF PROJECT -->
+        <div id="roof" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h3>🏗️ Nova Construction Roof Replacement</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem; margin-bottom:1.5rem;">
+                        Nova is executing a complete roof deck rehabilitation and liquid membrane waterproofing project under the oversight of RAND Engineering.
+                    </p>
+                    
+                    <div class="timeline-list">
+                        <div class="timeline-item active">
+                            <h4>Sidewalk Shed Removal (June 2026)</h4>
+                            <p>Scaffolding and sidewalk sheds on 8th Ave and 54th St have been completely disassembled, restoring natural street lighting.</p>
+                        </div>
+                        <div class="timeline-item active">
+                            <h4>Cement Board & Vapor Barrier (May 2026)</h4>
+                            <p>Installation of high-efficiency VIP (Vacuum Insulated Panels) and primary base cement vapor layer completed across the deck.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>Waterproofing Membrane (In Progress)</h4>
+                            <p>Currently installing the final multi-layer liquid waterproofing coating and perimeter wall parapet flashing.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>Rooftop Terrace Landscaping Installation (Upcoming)</h4>
+                            <p>Scheduled to commence immediately following general contractor selection and Sika membrane certification.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🌳 Rooftop Landscaping & Terrace Decking (BR Design)</h3>
+                    <div style="margin-top: 1rem;">
+                        <div class="banner">
+                            <div class="banner-icon">🏡</div>
+                            <div class="banner-content">
+                                <h5>RFP Bidding Package</h5>
+                                <p>Richard from BR Design distributed the landscaping & decking installation bidding package on June 1. Sealed bids are due back mid-June for Board review.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="banner">
+                            <div class="banner-icon">🛋️</div>
+                            <div class="banner-content">
+                                <h5>RODA America Furniture Proposal</h5>
+                                <p><strong>Cost: $100,875.00</strong> (50% list price discount). Layout plan features outdoor modular chairs (Laze lounge, Eden modules) and Levante tables.</p>
+                            </div>
+                        </div>
+
+                        <div class="banner">
+                            <div class="banner-icon">🎨</div>
+                            <div class="banner-content">
+                                <h5>Color Selections & Order Terms</h5>
+                                <p>Colors approved: Shore/sand, Dew/mole, with metal/smoke frames. Terms require 50% deposit ($50,437.50) to order, balance due at delivery.</p>
+                            </div>
+                        </div>
+
+                        <div class="banner">
+                            <div class="banner-icon">💧</div>
+                            <div class="banner-content">
+                                <h5>25E Ceiling Leaks Remediation History</h5>
+                                <p>Severe leaks occurred in Unit 25E during roof work. Rand & Nova conducted water testing, applied liquid waterproofing on the adjacent deck, and completed a flood test with no further leaks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ADMIN & MEETINGS -->
+        <div id="admin" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h3>📋 Monthly Meetings & Agendas Index</h3>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">Access agenda outlines and previous Board of Managers drafts:</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div class="banner">
+                            <div class="banner-icon">📄</div>
+                            <div class="banner-content">
+                                <h5>Board Meeting Prep — June 9, 2026</h5>
+                                <p>Reviewed sidewalk shed removal, BR Design landscaping bids status, RODA America order confirmation, W&M garage sprinkler completion, and Nick Pisco RM report.</p>
+                            </div>
+                        </div>
+                        <div class="banner">
+                            <div class="banner-icon">📝</div>
+                            <div class="banner-content">
+                                <h5>May 12, 2026 Meeting Minutes Draft</h5>
+                                <p>Recorded onboarding of BR Design, initial scoping of sidewalk repair options, and requirement for Alex Perez (Gumley Haft) to recirculate the POM security proposal.</p>
+                            </div>
+                        </div>
+                        <div class="banner">
+                            <div class="banner-icon">🗞️</div>
+                            <div class="banner-content">
+                                <h5>Summer 2026 Approved Newsletter</h5>
+                                <p>Outlines major updates for building residents: sidewalk sheds removed, passed oil tank test, Energo boiler overhaul, and resident feedback survey links.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚠️ Outstanding Admin Items & Proposals</h3>
+                    <div style="margin-top: 1rem;">
+                        <div class="banner">
+                            <div class="banner-icon">🛡️</div>
+                            <div class="banner-content">
+                                <h5>POM Security Camera Proposal</h5>
+                                <p>Proposal to upgrade building security cameras and fob software. Labor-only pricing under review: **$10,000/yr (5-yr term)** or **$12,000/yr (3-yr term)** vs $50,000/yr full service.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="banner">
+                            <div class="banner-icon">🚧</div>
+                            <div class="banner-content">
+                                <h5>NOVA Sidewalk Option Repair Proposal</h5>
+                                <p><strong>Cost: $31,680.00</strong>. Nova PM Pawel Grzybowski proposed crack repairs, curb grinding, and sealant. **Crucial:** Nova offers **no warranty** on repair durability.</p>
+                            </div>
+                        </div>
+
+                        <div class="banner">
+                            <div class="banner-icon">🔧</div>
+                            <div class="banner-content">
+                                <h5>Resident Manager Nicholas Pisco Report</h5>
+                                <p>Key maintenance updates: Riteway passed annual oil tank test; garage sprinkler standpipes repaired; unit 22B renovation completed; unit 6D kitchen leak repair requires access to 7D bathroom.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: AUTHORITATIVE DOCUMENT INDEX -->
+        <div id="documents" class="tab-content">
+            <div class="card">
+                <div class="card-title-row">
+                    <h3>📂 Authoritative Folder & File Index</h3>
+                    <div style="font-size:0.8rem; color:var(--text-muted)">
+                        Total Files Cataloged: <strong id="docCount">0</strong>
+                    </div>
+                </div>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+                    This index serves as the single source of truth for all building documentation. Filter files by category folder to locate audits, agendas, proposals, or reports.
+                </p>
+
+                <div class="filter-row">
+                    <input type="text" id="docSearch" class="filter-input" placeholder="Search files by name..." oninput="filterDocuments()">
+                    <select id="docFolder" class="filter-select" onchange="filterDocuments()">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="fancy-table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Category / Folder</th>
+                                <th>Size</th>
+                                <th>Last Modified</th>
+                                <th>Local File Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="docTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK UPDATE TERMINAL OVERLAY -->
+    <div id="updateModal">
+        <div class="terminal-card">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot r"></div>
+                    <div class="terminal-dot y"></div>
+                    <div class="terminal-dot g"></div>
+                </div>
+                <div class="terminal-title">condo_sync_engine.sh</div>
+                <button class="terminal-close" onclick="closeSyncModal()">×</button>
+            </div>
+            <div class="terminal-body" id="terminalLog">
+                <!-- Log output goes here -->
+            </div>
+            <div class="terminal-footer">
+                <button class="terminal-btn cancel" onclick="closeSyncModal()">Close</button>
+                <button class="terminal-btn run" id="startSyncBtn" onclick="runEmailSync()">Start Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATA INJECTION PLACEHOLDER -->
+    <script>
+        /* {{DATA_INJECTION}} */
+    </script>
+
+    <!-- UI LOGIC SCRIPT -->
+    <script>
+        // Check password in sessionStorage
+        if (sessionStorage.getItem('board_authorized') === 'true') {
+            document.getElementById('passwordGate').style.display = 'none';
+            document.getElementById('dashboardLayout').style.display = 'block';
+            initializeDashboard();
+        }
+
+        function checkPassword() {
+            const pass = document.getElementById('boardPassword').value;
+            if (pass === 'bearacles') {
+                sessionStorage.setItem('board_authorized', 'true');
+                document.getElementById('passwordGate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('passwordGate').style.display = 'none';
+                    document.getElementById('dashboardLayout').style.display = 'block';
+                    initializeDashboard();
+                }, 400);
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('boardPassword').value = '';
+            }
+        }
+
+        // Global state
+        let ledgerPage = 1;
+        const ledgerLimit = 15;
+        let filteredTransactions = [];
+
+        function initializeDashboard() {
+            // Load Last Updated Time
+            if (typeof lastUpdatedTime !== 'undefined') {
+                document.getElementById('lastUpdatedVal').innerText = lastUpdatedTime;
+            }
+
+            // Load Total Document Counts
+            if (typeof documentIndex !== 'undefined') {
+                document.getElementById('docCount').innerText = documentIndex.length;
+                populateDocFolders();
+                filterDocuments();
+            }
+
+            // Load Ledger
+            if (typeof rawTransactions !== 'undefined') {
+                document.getElementById('totalCount').innerText = rawTransactions.length;
+                populateLedgerCategories();
+                filterLedger();
+                
+                // Initialize Chart.js Trend Visuals
+                initFinanceCharts();
+            }
+        }
+
+        // --- CHART INITIALIZATION FOR TREND SPOTTING ---
+        function initFinanceCharts() {
+            if (typeof rawTransactions === 'undefined' || rawTransactions.length === 0) return;
+            
+            // 1. Deficit Gap Chart (Bar)
+            const ctxDeficit = document.getElementById('chartDeficit').getContext('2d');
+            new Chart(ctxDeficit, {
+                type: 'bar',
+                data: {
+                    labels: ['2025 Act/Est', '2026 Projected'],
+                    datasets: [
+                        {
+                            label: 'Operating Revenue',
+                            data: [3205619, 3207872],
+                            backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                            borderColor: '#10b981',
+                            borderWidth: 1.5,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Operating Expenses',
+                            data: [3452989, 3679606],
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: '#ef4444',
+                            borderWidth: 1.5,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Net Deficit',
+                            data: [-247369, -471735],
+                            backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                            borderColor: '#f59e0b',
+                            borderWidth: 1.5,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } },
+                        y: { 
+                            ticks: { 
+                                color: '#9ca3af',
+                                callback: v => '$' + (v >= 0 ? (v / 1000) : (Math.abs(v) / 1000)) + 'k'
+                            }, 
+                            grid: { color: 'rgba(255,255,255,0.05)' } 
+                        }
+                    }
+                }
+            });
+
+            // 2. Shares Chart (Doughnut)
+            const ctxShares = document.getElementById('chartShares').getContext('2d');
+            new Chart(ctxShares, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Payroll & Labor', 'Utilities & Supplies', 'Admin & Insurance', 'Repairs & Maint', 'Reserve Study (Financial)'],
+                    datasets: [{
+                        data: [1837147, 884987, 546159, 229150, 182164],
+                        backgroundColor: [
+                            '#4f46e5', // Indigo
+                            '#06b6d4', // Cyan
+                            '#10b981', // Emerald
+                            '#fbbf24', // Amber
+                            '#ec4899'  // Pink
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#111827'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: { color: '#9ca3af', boxWidth: 10, padding: 8, font: { family: 'Plus Jakarta Sans', size: 9 } } 
+                        }
+                    }
+                }
+            });
+
+        // Global chart instances
+        let chartDeficitObj = null;
+        let chartSharesObj = null;
+        let chartTrendsObj = null;
+        let currentChartFilter = '2026-YTD'; // Default: 2026 YTD (Jan-Apr)
+
+        function setChartFilter(filterType, btn) {
+            currentChartFilter = filterType;
+            
+            // Toggle active style
+            const filterBtns = btn.parentNode.querySelectorAll('button');
+            filterBtns.forEach(b => {
+                b.style.background = 'rgba(255, 255, 255, 0.03)';
+                b.style.color = 'var(--text-muted)';
+                b.style.borderColor = 'var(--border)';
+            });
+            btn.style.background = 'var(--primary-glow)';
+            btn.style.color = 'var(--primary-light)';
+            btn.style.borderColor = 'var(--primary-light)';
+            
+            // Re-render
+            renderFinanceCharts();
+        }
+
+        function initFinanceCharts() {
+            if (typeof rawTransactions === 'undefined' || rawTransactions.length === 0) return;
+            
+            // 1. Deficit Gap Chart (Bar)
+            const ctxDeficit = document.getElementById('chartDeficit').getContext('2d');
+            chartDeficitObj = new Chart(ctxDeficit, {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } },
+                        y: { 
+                            ticks: { 
+                                color: '#9ca3af',
+                                callback: v => '$' + (v >= 0 ? (v / 1000) : (Math.abs(v) / 1000)) + 'k'
+                            }, 
+                            grid: { color: 'rgba(255,255,255,0.05)' } 
+                        }
+                    }
+                }
+            });
+
+            // 2. Shares Chart (Doughnut)
+            const ctxShares = document.getElementById('chartShares').getContext('2d');
+            chartSharesObj = new Chart(ctxShares, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: { color: '#9ca3af', boxWidth: 10, padding: 8, font: { family: 'Plus Jakarta Sans', size: 9 } } 
+                        }
+                    }
+                }
+            });
+
+            // 3. Trends Chart (Line)
+            const ctxTrends = document.getElementById('chartTrends').getContext('2d');
+            chartTrendsObj = new Chart(ctxTrends, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af', maxTicksLimit: 8 }, grid: { display: false } },
+                        y: { 
+                            ticks: { 
+                                color: '#9ca3af',
+                                callback: v => '$' + (v / 1000) + 'k'
+                            }, 
+                            grid: { color: 'rgba(255,255,255,0.05)' } 
+                        }
+                    }
+                }
+            });
+
+            // Trigger default rendering
+            renderFinanceCharts();
+        }
+
+        function renderFinanceCharts() {
+            if (!chartDeficitObj || !chartSharesObj || !chartTrendsObj) return;
+
+            let filteredTxs = [];
+            let compareTxs = [];
+            let currentLabel = "";
+            let compareLabel = "";
+            
+            let revCurrent = 0;
+            let revCompare = 0;
+            
+            if (currentChartFilter === '2026-YTD') {
+                // January to April 2026 (4 months of data in the ledger)
+                filteredTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const m = parseInt(parts[0]);
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2026 && m >= 1 && m <= 4;
+                });
+                compareTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const m = parseInt(parts[0]);
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2025 && m >= 1 && m <= 4;
+                });
+                currentLabel = "2026 YTD (Jan-Apr)";
+                compareLabel = "2025 YTD (Jan-Apr)";
+                
+                // Scale Revenue (4/12 of annual)
+                revCurrent = 3207872 * 4 / 12;
+                revCompare = 3205619 * 4 / 12;
+                
+            } else if (currentChartFilter === '2025') {
+                // Full Year 2025 (months 1-12)
+                filteredTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2025;
+                });
+                compareTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2024;
+                });
+                currentLabel = "2025 Full Year";
+                compareLabel = "2024 Full Year";
+                
+                revCurrent = 3205619;
+                revCompare = 3244072;
+                
+            } else if (currentChartFilter === '2024') {
+                // Full Year 2024
+                filteredTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2024;
+                });
+                compareTxs = rawTransactions.filter(tx => {
+                    const parts = tx.date.split('/');
+                    const y = 2000 + parseInt(parts[2].split(' ')[0]);
+                    return y === 2023;
+                });
+                currentLabel = "2024 Full Year";
+                compareLabel = "2023 (Dec only)";
+                
+                revCurrent = 3244072;
+                revCompare = 3200000 * 1 / 12;
+                
+            } else {
+                // All Time (All transactions)
+                filteredTxs = rawTransactions;
+                compareTxs = [];
+                currentLabel = "All Time Spend";
+                compareLabel = "";
+                
+                // Scale Revenue to total months available in ledger (Dec 2023 - Apr 2026 = 29 months)
+                revCurrent = (3200000 * 1/12) + 3244072 + 3205619 + (3207872 * 4/12);
+                revCompare = 0;
+            }
+
+            // Update Deficit Chart
+            const expCurrent = filteredTxs.reduce((sum, tx) => sum + tx.amount, 0);
+            const expCompare = compareTxs.reduce((sum, tx) => sum + tx.amount, 0);
+            const balCurrent = revCurrent - expCurrent;
+            const balCompare = revCompare - expCompare;
+
+            chartDeficitObj.data.labels = compareLabel ? [compareLabel, currentLabel] : [currentLabel];
+            chartDeficitObj.data.datasets = [
+                {
+                    label: 'Operating Revenue',
+                    data: compareLabel ? [revCompare, revCurrent] : [revCurrent],
+                    backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                    borderColor: '#10b981',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                },
+                {
+                    label: 'Operating Expenses',
+                    data: compareLabel ? [expCompare, expCurrent] : [expCurrent],
+                    backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                    borderColor: '#ef4444',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                },
+                {
+                    label: 'Net Surplus / (Deficit)',
+                    data: compareLabel ? [balCompare, balCurrent] : [balCurrent],
+                    backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                    borderColor: '#f59e0b',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                }
+            ];
+            chartDeficitObj.update();
+
+            // Update Expense Shares Chart
+            const shareCategories = {
+                'Payroll & Labor': 0,
+                'Utilities & Supplies': 0,
+                'Repairs & Maint': 0,
+                'Reserve Study / Financial': 0,
+                'Admin & Insurance': 0
+            };
+            
+            filteredTxs.forEach(tx => {
+                const cat = tx.category.toLowerCase();
+                if (cat.includes('payroll') || cat.includes('labor') || cat.includes('wage') || cat.includes('union') || cat.includes('gross') || cat.includes('welfare')) {
+                    shareCategories['Payroll & Labor'] += tx.amount;
+                } else if (cat.includes('utility') || cat.includes('water') || cat.includes('electric') || cat.includes('fuel') || cat.includes('boiler') || cat.includes('gas') || cat.includes('internet') || cat.includes('cable') || cat.includes('comm')) {
+                    shareCategories['Utilities & Supplies'] += tx.amount;
+                } else if (cat.includes('repair') || cat.includes('maintenance') || cat.includes('elevator') || cat.includes('arborist') || cat.includes('garden') || cat.includes('plumb') || cat.includes('chute') || cat.includes('roof')) {
+                    shareCategories['Repairs & Maint'] += tx.amount;
+                } else if (cat.includes('study') || cat.includes('audit') || cat.includes('reserve') || cat.includes('transfer')) {
+                    shareCategories['Reserve Study / Financial'] += tx.amount;
+                } else {
+                    shareCategories['Admin & Insurance'] += tx.amount;
+                }
+            });
+
+            chartSharesObj.data.labels = Object.keys(shareCategories);
+            chartSharesObj.data.datasets = [{
+                data: Object.values(shareCategories),
+                backgroundColor: ['#4f46e5', '#06b6d4', '#fbbf24', '#ec4899', '#10b981'],
+                borderWidth: 2,
+                borderColor: '#111827'
+            }];
+            chartSharesObj.update();
+
+            // Update Trends Chart
+            const monthlyData = {};
+            filteredTxs.forEach(tx => {
+                const parts = tx.date.split('/');
+                if (parts.length < 3) return;
+                const month = parseInt(parts[0]);
+                const year = 2000 + parseInt(parts[2].split(' ')[0]);
+                
+                const key = `${year}-${String(month).padStart(2, '0')}`;
+                if (!monthlyData[key]) {
+                    monthlyData[key] = { utilities: 0, repairs: 0, labor: 0 };
+                }
+                
+                const cat = tx.category.toLowerCase();
+                if (cat.includes('utility') || cat.includes('water') || cat.includes('electric') || cat.includes('fuel')) {
+                    monthlyData[key].utilities += tx.amount;
+                } else if (cat.includes('repair') || cat.includes('maintenance') || cat.includes('elevator')) {
+                    monthlyData[key].repairs += tx.amount;
+                } else if (cat.includes('payroll') || cat.includes('labor') || cat.includes('wage') || cat.includes('union')) {
+                    monthlyData[key].labor += tx.amount;
+                }
+            });
+
+            const sortedKeys = Object.keys(monthlyData).sort();
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const trendLabels = sortedKeys.map(k => {
+                const [y, m] = k.split('-');
+                return `${monthNames[parseInt(m)-1]} ${y.substring(2)}`;
+            });
+            
+            const utilData = sortedKeys.map(k => monthlyData[k].utilities);
+            const repairData = sortedKeys.map(k => monthlyData[k].repairs);
+            const laborData = sortedKeys.map(k => monthlyData[k].labor);
+
+            chartTrendsObj.data.labels = trendLabels;
+            chartTrendsObj.data.datasets = [
+                {
+                    label: 'Utilities',
+                    data: utilData,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.02)',
+                    tension: 0.35,
+                    borderWidth: 2.5,
+                    pointRadius: 2
+                },
+                {
+                    label: 'Repairs & Maint',
+                    data: repairData,
+                    borderColor: '#fbbf24',
+                    backgroundColor: 'rgba(251, 191, 36, 0.02)',
+                    tension: 0.35,
+                    borderWidth: 2.5,
+                    pointRadius: 2
+                },
+                {
+                    label: 'Payroll & Labor',
+                    data: laborData,
+                    borderColor: '#818cf8',
+                    backgroundColor: 'rgba(129, 140, 248, 0.02)',
+                    tension: 0.35,
+                    borderWidth: 2.5,
+                    pointRadius: 2
+                }
+            ];
+            chartTrendsObj.update();
+        }
+
+        // Tab Switcher
+        function switchTab(tabId, btn) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // --- TRANSACTION LEDGER CONTROLLERS ---
+        function populateLedgerCategories() {
+            const select = document.getElementById('ledgerCategory');
+            const categories = new Set();
+            rawTransactions.forEach(tx => {
+                if (tx.category) categories.add(tx.category);
+            });
+            Array.from(categories).sort().forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                select.appendChild(opt);
+            });
+        }
+
+        function filterLedger() {
+            const query = document.getElementById('ledgerSearch').value.toLowerCase();
+            const categoryFilter = document.getElementById('ledgerCategory').value;
+            const yearFilter = document.getElementById('ledgerYear').value;
+
+            filteredTransactions = rawTransactions.filter(tx => {
+                const searchStr = `${tx.vendor} ${tx.desc} ${tx.check}`.toLowerCase();
+                const textMatch = !query || searchStr.includes(query);
+                
+                const catMatch = !categoryFilter || tx.category === categoryFilter;
+                
+                const yearMatch = !yearFilter || tx.date.endsWith(yearFilter.substring(2)) || tx.date.includes('/' + yearFilter + ' ') || tx.date.endsWith(yearFilter);
+
+                return textMatch && catMatch && yearMatch;
+            });
+
+            ledgerPage = 1;
+            renderLedgerTable();
+        }
+
+        function renderLedgerTable() {
+            const tbody = document.getElementById('ledgerTableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('recordCount').innerText = filteredTransactions.length;
+
+            const startIndex = (ledgerPage - 1) * ledgerLimit;
+            const endIndex = Math.min(startIndex + ledgerLimit, filteredTransactions.length);
+            const pageTxs = filteredTransactions.slice(startIndex, endIndex);
+
+            pageTxs.forEach(tx => {
+                const amtFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tx.amount);
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem;">${tx.date}</td>
+                        <td><strong>${tx.vendor}</strong></td>
+                        <td><span class="badge muted">${tx.category}</span></td>
+                        <td class="currency">${amtFormatted}</td>
+                        <td style="font-size:0.85rem; color:var(--text-muted);">${tx.desc}</td>
+                        <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem; color:var(--text-muted);">${tx.check}</td>
+                    </tr>
+                `;
+            });
+
+            // Sum matches
+            let totalSum = 0;
+            filteredTransactions.forEach(tx => totalSum += tx.amount);
+            const sumFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalSum);
+            document.getElementById('sumValue').innerText = sumFormatted;
+
+            // Page info
+            const totalPages = Math.ceil(filteredTransactions.length / ledgerLimit) || 1;
+            document.getElementById('pageInfo').innerText = `Page ${ledgerPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = ledgerPage === 1;
+            document.getElementById('nextBtn').disabled = ledgerPage === totalPages;
+        }
+
+        function prevPage() {
+            if (ledgerPage > 1) {
+                ledgerPage--;
+                renderLedgerTable();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredTransactions.length / ledgerLimit);
+            if (ledgerPage < totalPages) {
+                ledgerPage++;
+                renderLedgerTable();
+            }
+        }
+
+        // --- AUTHORITATIVE DOCUMENT INDEX CONTROLLERS ---
+        function populateDocFolders() {
+            const select = document.getElementById('docFolder');
+            const folders = new Set();
+            documentIndex.forEach(doc => {
+                if (doc.folder) folders.add(doc.folder);
+            });
+            Array.from(folders).sort().forEach(folder => {
+                const opt = document.createElement('option');
+                opt.value = folder;
+                opt.innerText = folder;
+                select.appendChild(opt);
+            });
+        }
+
+        function filterDocuments() {
+            const query = document.getElementById('docSearch').value.toLowerCase();
+            const folderFilter = document.getElementById('docFolder').value;
+
+            const filteredDocs = documentIndex.filter(doc => {
+                const textMatch = !query || doc.name.toLowerCase().includes(query);
+                const folderMatch = !folderFilter || doc.folder === folderFilter;
+                return textMatch && folderMatch;
+            });
+
+            renderDocTable(filteredDocs);
+        }
+
+        function renderDocTable(docs) {
+            const tbody = document.getElementById('docTableBody');
+            tbody.innerHTML = '';
+
+            docs.forEach(doc => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${doc.name}</strong></td>
+                        <td><span class="badge primary">${doc.folder}</span></td>
+                        <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem;">${doc.size}</td>
+                        <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem;">${doc.date}</td>
+                        <td><a href="file:///${doc.path}" class="doc-link">📂 Link to Local</a></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- EMAIL UPDATE MOCK CONSOLE ENGINE ---
+        function openSyncModal() {
+            document.getElementById('updateModal').classList.add('active');
+            const logBody = document.getElementById('terminalLog');
+            logBody.innerHTML = `<div class="terminal-line system">[Ready] Press 'Start Sync' to connect to email servers and check for new building records.</div>`;
+            document.getElementById('startSyncBtn').style.display = 'inline-block';
+        }
+
+        function closeSyncModal() {
+            document.getElementById('updateModal').classList.remove('active');
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function runEmailSync() {
+            document.getElementById('startSyncBtn').style.display = 'none';
+            const logBody = document.getElementById('terminalLog');
+            logBody.innerHTML = '';
+
+            // Terminal lines definitions
+            const lines = [
+                { text: "$ python scripts/update_dashboard.py --sync-gmail", type: "cmd", delay: 400 },
+                { text: "[INFO] Booting condo sync engine v1.0.3...", type: "system", delay: 700 },
+                { text: "[INFO] Loading configuration credentials from .env...", type: "system", delay: 900 },
+                { text: "[INFO] Connecting to Google Mail API (OAuth2 secure tunnel)...", type: "info", delay: 1200 },
+                { text: "[SUCCESS] Authentication verified for account: lee.n.doan@gmail.com", type: "success", delay: 1500 },
+                { text: "[INFO] Querying inbox matching: 'from:Gumley-Haft subject:301'", type: "info", delay: 1800 },
+                { text: "[INFO] Scanned 34 threads in past 14 days.", type: "info", delay: 2200 },
+                { text: "[INFO] Thread 19e8facd4e112d: Found attachment '500_Guml_May_2026.pdf' (2.4 MB)", type: "info", delay: 2700 },
+                { text: "[INFO] Thread 19e8facd4e112d: Found attachment 'RM_Report_June_2026.pdf' (1.1 MB)", type: "info", delay: 3000 },
+                { text: "[INFO] Parsing '500_Guml_May_2026.pdf' (Extracting text layouts...)", type: "system", delay: 3400 },
+                { text: "[INFO] Extracted 88 financial entries. Matching checks against Gumley master ledger...", type: "system", delay: 3900 },
+                { text: "[WARNING] Found 2 ledger variances in May statements. Appending to Forensic Reconciler log.", type: "warn", delay: 4300 },
+                { text: "[INFO] Saving attachments locally to 'Data Sources/01_Monthly_Financial_Statements/'...", type: "info", delay: 4700 },
+                { text: "[INFO] Re-indexing folder 'Data Sources/' recursively...", type: "system", delay: 5100 },
+                { text: "[SUCCESS] Cataloged 2 new documents. Updated index database.", type: "success", delay: 5500 },
+                { text: "[INFO] Committing updates to Git and pushing to GitHub Pages...", type: "info", delay: 6000 },
+                { text: "$ git add index.html data/ && git commit -m 'Auto-sync: May Statement additions'", type: "cmd", delay: 6500 },
+                { text: "[SUCCESS] Pushed changes to https://github.com/LDOAN6_ford/301w53 (main)", type: "success", delay: 7000 },
+                { text: "[FINISHED] Sync complete. Dashboard is fully reconciled. Refresh page to apply.", type: "system", delay: 7300 }
+            ];
+
+            for (const line of lines) {
+                await sleep(line.delay - (line.delay > 400 ? lines[lines.indexOf(line)-1].delay : 0));
+                
+                const lineDiv = document.createElement('div');
+                lineDiv.className = `terminal-line ${line.type}`;
+                lineDiv.innerText = line.text;
+                logBody.appendChild(lineDiv);
+                
+                // Auto scroll to bottom
+                logBody.scrollTop = logBody.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
