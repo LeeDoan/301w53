@@ -1565,8 +1565,8 @@
                 populateLedgerCategories();
                 filterLedger();
                 
-                // Initialize Chart.js Trend Visuals
-                initFinanceCharts();
+                // Initialize Chart.js Trend Visuals (lazy-loaded on tab switch to avoid 0px height issue)
+                // initFinanceCharts();
             }
         }
 
@@ -1891,6 +1891,17 @@
 
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
+
+            // Lazy-load Chart.js graphs to avoid 0x0 container size issue when initialized in a hidden tab
+            if (tabId === 'finance') {
+                if (!chartDeficitObj) {
+                    initFinanceCharts();
+                } else {
+                    chartDeficitObj.resize();
+                    chartSharesObj.resize();
+                    chartTrendsObj.resize();
+                }
+            }
         }
 
         // --- TRANSACTION LEDGER CONTROLLERS ---
