@@ -791,6 +791,158 @@
         .table-btn-sm:hover {
             background: var(--surface-hover);
         }
+
+        /* Roof Project Top Graphics Styles */
+        .roof-budget-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .roof-budget-metrics {
+            flex-grow: 1;
+        }
+
+        .roof-budget-metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding-bottom: 0.25rem;
+        }
+
+        .roof-budget-metric-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .roof-budget-metric-item span {
+            color: var(--text-muted);
+        }
+
+        .roof-budget-metric-item strong {
+            color: white;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+
+        .roof-timeline-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 1.5rem;
+        }
+
+        .milestone-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.25rem;
+            position: relative;
+            padding: 0 1rem;
+        }
+
+        .milestone-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .milestone-bubble {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .milestone-bubble.completed {
+            background: var(--success);
+            color: #111827;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .milestone-bubble.active {
+            background: var(--primary-glow);
+            border: 2px solid var(--primary-light);
+            color: var(--primary-light);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            animation: pulse-ring 2s infinite;
+        }
+
+        .milestone-bubble.pending {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .milestone-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .milestone-date {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .timeline-arrow-line {
+            flex-grow: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.08);
+            margin: 0 -15px;
+            position: relative;
+            transform: translateY(-20px);
+            z-index: 1;
+        }
+
+        .timeline-arrow-line.completed-arrow {
+            background: linear-gradient(to right, var(--success), var(--primary-light));
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.2);
+        }
+
+        .timeline-arrow-line.dashed-arrow {
+            background: transparent;
+            border-top: 3px dashed rgba(255,255,255,0.15);
+        }
+
+        .timeline-arrowhead {
+            position: absolute;
+            right: -2px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid rgba(255,255,255,0.2);
+        }
+
+        .timeline-arrow-line.completed-arrow .timeline-arrowhead {
+            border-left-color: var(--primary-light);
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
+            70% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
     </style>
 </head>
 <body>
@@ -1089,6 +1241,85 @@
 
         <!-- TAB: ROOF PROJECT -->
         <div id="roof" class="tab-content">
+            <!-- TOP GRAPHICS GRID -->
+            <div class="grid-2" style="margin-bottom: 1.5rem;">
+                <!-- Budget Card -->
+                <div class="card roof-budget-wrapper">
+                    <div class="progress-ring-container" style="position: relative; width: 120px; height: 120px; flex-shrink: 0;">
+                        <svg width="120" height="120">
+                            <!-- Background circle -->
+                            <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.05)" stroke-width="10" fill="transparent"/>
+                            <!-- Active circle (representing 39.92% spent, circumference=314.16, dashoffset=188.75) -->
+                            <circle cx="60" cy="60" r="50" stroke="var(--primary-light)" stroke-width="10" fill="transparent"
+                                    stroke-dasharray="314.16" stroke-dashoffset="188.75" stroke-linecap="round"
+                                    transform="rotate(-90 60 60)"/>
+                        </svg>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <span style="font-size: 1.25rem; font-weight: 700; color: white;">39.9%</span>
+                            <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Spent</span>
+                        </div>
+                    </div>
+                    <div class="roof-budget-metrics">
+                        <h4 style="margin-bottom: 0.75rem; color: white; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>💰 Special Assessment Budget</span>
+                        </h4>
+                        <div class="roof-budget-metric-item">
+                            <span>Initial Total Assessment (Budget)</span>
+                            <strong>$4,000,000</strong>
+                        </div>
+                        <div class="roof-budget-metric-item">
+                            <span>Residential Allocation (92%)</span>
+                            <strong>$3,680,000</strong>
+                        </div>
+                        <div class="roof-budget-metric-item">
+                            <span>Total Spent to Date (Nova)</span>
+                            <strong>$1,596,859</strong>
+                        </div>
+                        <div class="roof-budget-metric-item" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.4rem; margin-top: 0.25rem;">
+                            <span style="color: var(--primary-light); font-weight: 600;">Remaining Project Funds</span>
+                            <strong style="color: var(--primary-light); font-weight: 700;">$2,403,141</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Card -->
+                <div class="card roof-timeline-wrapper">
+                    <h4 style="color: white; font-size: 0.95rem; margin-bottom: 0.5rem;">🏗️ Roof Project Progress Timeline</h4>
+                    <div class="milestone-container">
+                        <!-- Node 1: Completed -->
+                        <div class="milestone-node">
+                            <div class="milestone-bubble completed">✓</div>
+                            <span class="milestone-label">Sheds Removed</span>
+                            <span class="milestone-date">June 2026</span>
+                        </div>
+                        
+                        <!-- Arrow 1 (Completed to Active) -->
+                        <div class="timeline-arrow-line completed-arrow">
+                            <div class="timeline-arrowhead"></div>
+                        </div>
+                        
+                        <!-- Node 2: Active (Current) -->
+                        <div class="milestone-node">
+                            <div class="milestone-bubble active">⚡</div>
+                            <span class="milestone-label">Waterproofing</span>
+                            <span class="milestone-date">In Progress</span>
+                        </div>
+                        
+                        <!-- Arrow 2 (Active to Pending) -->
+                        <div class="timeline-arrow-line dashed-arrow">
+                            <div class="timeline-arrowhead"></div>
+                        </div>
+                        
+                        <!-- Node 3: Pending -->
+                        <div class="milestone-node">
+                            <div class="milestone-bubble pending">🌳</div>
+                            <span class="milestone-label">Landscaping</span>
+                            <span class="milestone-date">Summer 2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid-2">
                 <div class="card">
                     <h3>🏗️ Nova Construction Roof Replacement</h3>
@@ -18150,7 +18381,7 @@
         "snippet": "A few additional details that were lost in my Joyce-ian stream of consciousness. We started with some slack in the budget. As the project progressed, we discovered more issues that require addressing."
     }
 ];
-        const lastUpdatedTime = "2026-06-13 11:24 AM";
+        const lastUpdatedTime = "2026-06-13 06:41 PM";
     
     </script>
 
