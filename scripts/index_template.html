@@ -274,6 +274,30 @@
             box-shadow: inset 0 0 0 1px var(--primary-light);
         }
 
+        .subtab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .subtab-btn:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .subtab-btn.active {
+            color: white;
+            background: var(--primary-glow);
+            box-shadow: inset 0 0 0 1px var(--primary-light);
+        }
+
         /* --- CONTENT CONTAINERS --- */
         .tab-content {
             display: none;
@@ -1249,13 +1273,13 @@
                         <svg width="120" height="120">
                             <!-- Background circle -->
                             <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.05)" stroke-width="10" fill="transparent"/>
-                            <!-- Active circle (representing 39.92% spent, circumference=314.16, dashoffset=188.75) -->
-                            <circle cx="60" cy="60" r="50" stroke="var(--primary-light)" stroke-width="10" fill="transparent"
-                                    stroke-dasharray="314.16" stroke-dashoffset="188.75" stroke-linecap="round"
-                                    transform="rotate(-90 60 60)"/>
+                            <!-- Active circle -->
+                            <circle id="roofProgressCircle" cx="60" cy="60" r="50" stroke="var(--primary-light)" stroke-width="10" fill="transparent"
+                                    stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round"
+                                    transform="rotate(-90 60 60)" style="transition: stroke-dashoffset 1s ease-in-out;"/>
                         </svg>
                         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <span style="font-size: 1.25rem; font-weight: 700; color: white;">39.9%</span>
+                            <span id="roofProgressPercent" style="font-size: 1.25rem; font-weight: 700; color: white;">0%</span>
                             <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Spent</span>
                         </div>
                     </div>
@@ -1272,12 +1296,12 @@
                             <strong>$3,680,000</strong>
                         </div>
                         <div class="roof-budget-metric-item">
-                            <span>Total Spent to Date (Nova)</span>
-                            <strong>$1,596,859</strong>
+                            <span>Total Spent to Date (Ledger)</span>
+                            <strong id="roofSpentVal">$0</strong>
                         </div>
                         <div class="roof-budget-metric-item" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.4rem; margin-top: 0.25rem;">
-                            <span style="color: var(--primary-light); font-weight: 600;">Remaining Project Funds</span>
-                            <strong style="color: var(--primary-light); font-weight: 700;">$2,403,141</strong>
+                            <span style="color: var(--primary-light); font-weight: 600;">Remaining Assessment Funds</span>
+                            <strong id="roofRemainingVal" style="color: var(--primary-light); font-weight: 700;">$4,000,000</strong>
                         </div>
                     </div>
                 </div>
@@ -1381,6 +1405,109 @@
                                 <p>Severe leaks occurred in Unit 25E during roof work. Rand & Nova conducted water testing, applied liquid waterproofing on the adjacent deck, and completed a flood test with no further leaks.</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROJECT FINANCIALS SUMMARY & LEDGER / FORECAST SECTION -->
+            <div class="grid-3" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1.5rem;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Total Spent to Date</span>
+                    <span id="roofSummarySpent" style="font-size: 1.75rem; font-weight: 700; color: white;">$0.00</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">81 reconciled ledger actuals</span>
+                </div>
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1.5rem;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Committed & Forecasted Future</span>
+                    <span id="roofSummaryForecast" style="font-size: 1.75rem; font-weight: 700; color: var(--primary-light);">$0.00</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Furniture + BRD SOWs + balances</span>
+                </div>
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1.5rem;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Est. Total Project Cost</span>
+                    <span id="roofSummaryTotalCost" style="font-size: 1.75rem; font-weight: 700; color: white;">$0.00</span>
+                    <span id="roofBudgetVariance" style="font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.35rem;">$0.00 over assessment</span>
+                </div>
+            </div>
+
+            <!-- DYNAMIC VARIANCE WARNING -->
+            <div id="roofWarningBanner" class="banner" style="margin-bottom: 1.5rem; display: none; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444;">
+                <div class="banner-icon">⚠️</div>
+                <div class="banner-content">
+                    <h5 style="color: #ef4444; font-size: 0.9rem;">Rooftop & Terrace Funding Gap Alert</h5>
+                    <p style="font-size: 0.85rem; color: #fecaca;">
+                        The estimated total cost of the project (actual spent to date plus all future phase commitments and proposals) is currently projected at 
+                        <strong id="roofWarningEstTotal" style="color: white;">$4.56M</strong>. This exceeds the approved $4.00M Special Assessment by 
+                        <strong id="roofWarningVariance" style="color: white;">$558k</strong>. The board will need to identify additional funding sources or pursue value engineering options.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border); padding-bottom:1rem; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+                    <div style="display:flex; gap:0.5rem;">
+                        <button id="btnRoofActuals" class="subtab-btn active" onclick="switchRoofSubTab('actuals')">📋 Actual Expenditures</button>
+                        <button id="btnRoofForecast" class="subtab-btn" onclick="switchRoofSubTab('forecast')">🔮 Forecast & Committed Spend</button>
+                    </div>
+                    <div>
+                        <span style="font-size:0.85rem; color:var(--text-muted);">Selected Sum: <strong id="roofSubTabTotal" style="color:var(--primary-light); font-size:1.05rem;">$0.00</strong></span>
+                    </div>
+                </div>
+
+                <!-- Sub-tab: Actuals -->
+                <div id="roofSubTabActuals">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.75rem; flex:1; min-width:280px;">
+                            <input type="text" id="roofLedgerSearch" placeholder="Search actual expenditures (vendor, description, check)..." oninput="filterRoofLedger()" style="padding:0.6rem 1rem; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.2); color:white; font-size:0.85rem; width:100%;">
+                            <select id="roofVendorSelect" onchange="filterRoofLedger()" style="padding:0.6rem 1rem; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.2); color:white; font-size:0.85rem; min-width:180px;">
+                                <option value="">All Vendors</option>
+                            </select>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">
+                            Showing <strong id="roofRecordCount" style="color:white;">0</strong> transactions
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="fancy-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Date</th>
+                                    <th>Vendor</th>
+                                    <th>Category</th>
+                                    <th class="currency" style="width: 120px;">Amount</th>
+                                    <th>Description</th>
+                                    <th style="width: 100px;">Check #</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roofLedgerTableBody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                        <button id="roofPrevBtn" class="subtab-btn" onclick="prevRoofPage()" style="padding:0.4rem 0.8rem; font-size:0.8rem; border: 1px solid var(--border); border-radius: 4px;">Previous</button>
+                        <span id="roofPageInfo" style="font-size:0.8rem; color:var(--text-muted);">Page 1 of 1</span>
+                        <button id="roofNextBtn" class="subtab-btn" onclick="nextRoofPage()" style="padding:0.4rem 0.8rem; font-size:0.8rem; border: 1px solid var(--border); border-radius: 4px;">Next</button>
+                    </div>
+                </div>
+
+                <!-- Sub-tab: Forecast -->
+                <div id="roofSubTabForecast" style="display:none;">
+                    <div class="table-container">
+                        <table class="fancy-table">
+                            <thead>
+                                <tr>
+                                    <th>Vendor</th>
+                                    <th>Category</th>
+                                    <th class="currency" style="width: 140px;">Forecasted Amount</th>
+                                    <th>Description / Notes</th>
+                                    <th style="width: 160px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roofForecastTableBody">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1568,6 +1695,239 @@
                 // Initialize Chart.js Trend Visuals (lazy-loaded on tab switch to avoid 0px height issue)
                 // initFinanceCharts();
             }
+
+            // Load Roof Project Financials
+            if (typeof roofTransactions !== 'undefined') {
+                initializeRoofProject();
+            }
+        }
+
+        // --- ROOF PROJECT CONTROLLERS ---
+        let roofLedgerPage = 1;
+        const roofLedgerLimit = 15;
+        let filteredRoofTxs = [];
+        let currentRoofSubTab = 'actuals';
+
+        function initializeRoofProject() {
+            if (typeof roofTransactions === 'undefined' || typeof roofForecast === 'undefined') return;
+
+            // 1. Calculate Actual Total Spent
+            let actualSpent = 0;
+            roofTransactions.forEach(tx => actualSpent += tx.amount);
+
+            // 2. Calculate Forecasted Total
+            let forecastedTotal = 0;
+            roofForecast.forEach(item => forecastedTotal += item.amount);
+
+            // 3. Overall numbers
+            const budgetTotal = 4000000.00;
+            const remainingBudget = budgetTotal - actualSpent;
+            const estTotalCost = actualSpent + forecastedTotal;
+            const variance = estTotalCost - budgetTotal;
+
+            // Format currencies
+            const fmt = val => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
+            const fmtFloat = val => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+
+            // 4. Update dynamic top graphics
+            const percentSpent = (actualSpent / budgetTotal) * 100;
+            document.getElementById('roofProgressPercent').innerText = percentSpent.toFixed(1) + '%';
+            
+            // Circular SVG dashoffset: circum = 314.16. Offset = 314.16 - (314.16 * (percent / 100))
+            const circ = 314.16;
+            const offset = circ - (circ * (Math.min(percentSpent, 100) / 100));
+            document.getElementById('roofProgressCircle').style.strokeDashoffset = offset;
+
+            // Top Budget Card metrics
+            document.getElementById('roofSpentVal').innerText = fmt(actualSpent);
+            document.getElementById('roofRemainingVal').innerText = fmt(remainingBudget);
+
+            // 5. Update bottom summary boxes
+            document.getElementById('roofSummarySpent').innerText = fmtFloat(actualSpent);
+            document.getElementById('roofSummaryForecast').innerText = fmtFloat(forecastedTotal);
+            document.getElementById('roofSummaryTotalCost').innerText = fmtFloat(estTotalCost);
+
+            // Variance formatting
+            const varianceBox = document.getElementById('roofBudgetVariance');
+            if (variance > 0) {
+                varianceBox.innerText = fmtFloat(variance) + ' over assessment';
+                varianceBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                varianceBox.style.color = '#ef4444';
+                
+                // Show warning banner
+                document.getElementById('roofWarningBanner').style.display = 'flex';
+                document.getElementById('roofWarningEstTotal').innerText = fmtFloat(estTotalCost);
+                document.getElementById('roofWarningVariance').innerText = fmtFloat(variance);
+            } else {
+                varianceBox.innerText = fmtFloat(Math.abs(variance)) + ' under assessment';
+                varianceBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                varianceBox.style.color = '#10b981';
+                document.getElementById('roofWarningBanner').style.display = 'none';
+            }
+
+            // 6. Populate select dropdown & filter state
+            populateRoofVendors();
+            filteredRoofTxs = [...roofTransactions];
+            roofLedgerPage = 1;
+
+            // 7. Render tables
+            renderRoofLedgerTable();
+            renderRoofForecastTable();
+            updateSubTabTotal();
+        }
+
+        function populateRoofVendors() {
+            const select = document.getElementById('roofVendorSelect');
+            // Clear existing except first
+            select.innerHTML = '<option value="">All Vendors</option>';
+            const vendors = new Set();
+            roofTransactions.forEach(tx => {
+                if (tx.vendor) vendors.add(tx.vendor);
+            });
+            Array.from(vendors).sort().forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.innerText = v;
+                select.appendChild(opt);
+            });
+        }
+
+        function filterRoofLedger() {
+            const query = document.getElementById('roofLedgerSearch').value.toLowerCase();
+            const vendorFilter = document.getElementById('roofVendorSelect').value;
+
+            filteredRoofTxs = roofTransactions.filter(tx => {
+                const searchStr = `${tx.vendor} ${tx.desc} ${tx.check}`.toLowerCase();
+                const textMatch = !query || searchStr.includes(query);
+                const vendorMatch = !vendorFilter || tx.vendor === vendorFilter;
+                return textMatch && vendorMatch;
+            });
+
+            roofLedgerPage = 1;
+            renderRoofLedgerTable();
+            updateSubTabTotal();
+        }
+
+        function renderRoofLedgerTable() {
+            const tbody = document.getElementById('roofLedgerTableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('roofRecordCount').innerText = filteredRoofTxs.length;
+
+            const startIndex = (roofLedgerPage - 1) * roofLedgerLimit;
+            const endIndex = Math.min(startIndex + roofLedgerLimit, filteredRoofTxs.length);
+            const pageTxs = filteredRoofTxs.slice(startIndex, endIndex);
+
+            if (pageTxs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:2rem;">No matching expenditures found.</td></tr>';
+            } else {
+                pageTxs.forEach(tx => {
+                    const amtFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tx.amount);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem;">${tx.date}</td>
+                            <td><strong>${tx.vendor}</strong></td>
+                            <td><span class="badge muted">${tx.category}</span></td>
+                            <td class="currency" style="font-weight:600; color:white;">${amtFormatted}</td>
+                            <td style="font-size:0.85rem; color:var(--text-muted);">${tx.desc}</td>
+                            <td style="font-family:'JetBrains Mono', monospace; font-size:0.8rem; color:var(--text-muted);">${tx.check}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Page info
+            const totalPages = Math.ceil(filteredRoofTxs.length / roofLedgerLimit) || 1;
+            document.getElementById('roofPageInfo').innerText = `Page ${roofLedgerPage} of ${totalPages}`;
+            document.getElementById('roofPrevBtn').disabled = roofLedgerPage === 1;
+            document.getElementById('roofNextBtn').disabled = roofLedgerPage === totalPages;
+        }
+
+        function renderRoofForecastTable() {
+            const tbody = document.getElementById('roofForecastTableBody');
+            tbody.innerHTML = '';
+
+            if (typeof roofForecast === 'undefined' || roofForecast.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">No forecasted items available.</td></tr>';
+                return;
+            }
+
+            // Sort by category, then amount desc
+            const sortedForecast = [...roofForecast].sort((a, b) => {
+                if (a.category !== b.category) return a.category.localeCompare(b.category);
+                return b.amount - a.amount;
+            });
+
+            sortedForecast.forEach(item => {
+                const amtFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.amount);
+                
+                // Color badges by status
+                let statusClass = 'muted';
+                if (item.status.includes('Approved') || item.status.includes('Committed')) {
+                    statusClass = 'success';
+                } else if (item.status.includes('Proposed') || item.status.includes('Estimate')) {
+                    statusClass = 'warning';
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${item.vendor}</strong></td>
+                        <td><span class="badge muted">${item.category}</span></td>
+                        <td class="currency" style="font-weight:600; color:var(--primary-light);">${amtFormatted}</td>
+                        <td style="font-size:0.85rem; color:var(--text-muted);">${item.desc}</td>
+                        <td><span class="badge ${statusClass}">${item.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function prevRoofPage() {
+            if (roofLedgerPage > 1) {
+                roofLedgerPage--;
+                renderRoofLedgerTable();
+            }
+        }
+
+        function nextRoofPage() {
+            const totalPages = Math.ceil(filteredRoofTxs.length / roofLedgerLimit);
+            if (roofLedgerPage < totalPages) {
+                roofLedgerPage++;
+                renderRoofLedgerTable();
+            }
+        }
+
+        function switchRoofSubTab(tab) {
+            currentRoofSubTab = tab;
+            
+            // Toggle buttons
+            const btnActuals = document.getElementById('btnRoofActuals');
+            const btnForecast = document.getElementById('btnRoofForecast');
+            
+            if (tab === 'actuals') {
+                btnActuals.classList.add('active');
+                btnForecast.classList.remove('active');
+                document.getElementById('roofSubTabActuals').style.display = 'block';
+                document.getElementById('roofSubTabForecast').style.display = 'none';
+            } else {
+                btnActuals.classList.remove('active');
+                btnForecast.classList.add('active');
+                document.getElementById('roofSubTabActuals').style.display = 'none';
+                document.getElementById('roofSubTabForecast').style.display = 'block';
+            }
+
+            updateSubTabTotal();
+        }
+
+        function updateSubTabTotal() {
+            let total = 0;
+            if (currentRoofSubTab === 'actuals') {
+                filteredRoofTxs.forEach(tx => total += tx.amount);
+            } else {
+                if (typeof roofForecast !== 'undefined') {
+                    roofForecast.forEach(item => total += item.amount);
+                }
+            }
+            document.getElementById('roofSubTabTotal').innerText = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(total);
         }
 
         // Global chart instances

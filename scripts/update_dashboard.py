@@ -101,7 +101,6 @@ def load_email_data():
     ]
     
     filtered_emails = []
-    seen_subjects = set()
     
     for email in emails:
         subject = str(email.get("subject", "")).lower()
@@ -111,10 +110,6 @@ def load_email_data():
         # Check if email is relevant based on keywords
         is_relevant = any(k in subject or k in snippet for k in keywords)
         if is_relevant:
-            # Clean subject (remove Re:, Fwd:, etc. for duplicate checking if wanted)
-            clean_subj = subject.replace("re:", "").replace("fwd:", "").strip()
-            
-            # For the dashboard, we want a curated list, let's keep it clean
             filtered_emails.append({
                 "date": email.get("date", ""),
                 "from": from_val,
@@ -122,11 +117,122 @@ def load_email_data():
                 "snippet": email.get("snippet", "")
             })
             
-    # Sort emails - note dates are like "Fri, 29 May 2026 17:50:22 +0000"
-    # For a simple prototype, we'll keep the order from the json (newest is generally first or last)
-    # Let's limit to top 60 relevant emails to keep file size optimized
     print(f"Extracted {len(filtered_emails)} relevant emails.")
     return filtered_emails[:60]
+
+def get_roof_transactions(transactions):
+    print("Filtering Roof & Terrace Transactions...")
+    roof_checks = set()
+    roof_keywords = ["ROOF", "FACADE", "FISP", "LEAK", "WATER INFILTRATION", "CON-RO", "PROBES", "TERRACE", "DECK", "LANDSC"]
+    direct_vendors = ["NOVA", "GARDINER", "THEOBALD", "G&T", "BR DESIGN", "BRD", "TERRAIN"]
+    
+    for tx in transactions:
+        v = tx.get("vendor", "").upper()
+        desc = tx.get("desc", "").upper()
+        check = tx.get("check", "")
+        
+        is_direct = any(dv in v for dv in direct_vendors)
+        has_kw = any(kw in desc for kw in roof_keywords)
+        
+        if (is_direct or ("RAND" in v and has_kw)) and check:
+            roof_checks.add(check)
+            
+    roof_txs = []
+    for tx in transactions:
+        v = tx.get("vendor", "").upper()
+        desc = tx.get("desc", "").upper()
+        check = tx.get("check", "")
+        
+        is_selected = False
+        if check in roof_checks:
+            if any(x in v for x in ["NOVA", "GARDINER", "THEOBALD", "G&T", "BR DESIGN", "BRD", "TERRAIN", "RAND"]):
+                is_selected = True
+        elif any(dv in v for dv in direct_vendors):
+            is_selected = True
+        elif "RAND" in v and any(kw in desc for kw in roof_keywords):
+            is_selected = True
+            
+        if is_selected:
+            # Filter out non-roof items
+            if any(x in desc for x in ["LOCAL LAW 88", "HEATING PLANT UPGRADE", "WATER PUMP SYSTEM", "COOLING TOWER", "PLUMBING SYSTEM EVAL", "CHIMNEY"]):
+                continue
+            roof_txs.append(tx)
+            
+    def parse_date(tx_obj):
+        try:
+            parts = tx_obj["date"].split('/')
+            m = int(parts[0])
+            d = int(parts[1])
+            y = int(parts[2].split(' ')[0])
+            if y < 100:
+                y += 2000
+            return (y, m, d)
+        except Exception:
+            return (0, 0, 0)
+            
+    roof_txs.sort(key=parse_date)
+    print(f"Filtered {len(roof_txs)} roof transactions.")
+    return roof_txs
+
+def build_forecast_data():
+    return [
+        {
+            "vendor": "NOVA Construction Services",
+            "category": "Contract Commitment",
+            "amount": 430000.00,
+            "desc": "Remaining committed balance on active roof waterproofing and rehabilitation contract.",
+            "status": "Committed Balance"
+        },
+        {
+            "vendor": "NOVA Construction Services",
+            "category": "Change Orders",
+            "amount": 40000.00,
+            "desc": "Remaining committed balance on approved change orders for envelope/structural repairs.",
+            "status": "Committed Balance"
+        },
+        {
+            "vendor": "RAND Engineering, P.C.",
+            "category": "Engineering Oversight",
+            "amount": 25000.00,
+            "desc": "Remaining committed balance for construction administration, monitoring, and final FISP sign-off.",
+            "status": "Committed Balance"
+        },
+        {
+            "vendor": "Terrain Landscape Arch",
+            "category": "Landscape Design SOW",
+            "amount": 20000.00,
+            "desc": "Remaining contract balance for site landscape planning, bidding prep, and architectural layout.",
+            "status": "Committed Balance"
+        },
+        {
+            "vendor": "RODA America Ltd",
+            "category": "Terrace Furniture",
+            "amount": 100875.00,
+            "desc": "Contract value for outdoor terrace furniture package (50% list price discount). Terms: 50% deposit ($50,437.50) approved to order, 50% balance due at delivery.",
+            "status": "Approved / Ordered"
+        },
+        {
+            "vendor": "Terrain Landscape Arch",
+            "category": "Terrace Construction",
+            "amount": 1800000.00,
+            "desc": "High-level construction estimate for landscaping, decking, soil, and installation (excludes furniture). Sub-contractor bids due mid-June 2026.",
+            "status": "Estimate / Bidding"
+        },
+        {
+            "vendor": "BR Design Associates",
+            "category": "Terrace Design SOW",
+            "amount": 41500.00,
+            "desc": "Architectural and design fee for pre-construction, value engineering, and trade oversight (approved; revised down from $60,000, saving $18,500).",
+            "status": "Approved SOW"
+        },
+        {
+            "vendor": "BR Design Associates",
+            "category": "Sidewalk Repair SOW",
+            "amount": 31680.00,
+            "desc": "Option 3: Full concrete sidewalk replacement (approx 1,200 sq ft) with 5-year warranty. Recommended by BR Design to resolve tripping hazards.",
+            "status": "Proposed SOW"
+        }
+    ]
 
 def main():
     if not os.path.exists(TEMPLATE_PATH):
@@ -136,6 +242,8 @@ def main():
     doc_index = scan_data_sources()
     transactions = load_ledger_data()
     emails = load_email_data()
+    roof_txs = get_roof_transactions(transactions)
+    roof_forecast = build_forecast_data()
     
     last_updated_str = datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
     
@@ -149,6 +257,8 @@ def main():
         const rawTransactions = {json.dumps(transactions, indent=4)};
         const relevantEmails = {json.dumps(emails, indent=4)};
         const lastUpdatedTime = "{last_updated_str}";
+        const roofTransactions = {json.dumps(roof_txs, indent=4)};
+        const roofForecast = {json.dumps(roof_forecast, indent=4)};
     """
     
     # Inject Data
