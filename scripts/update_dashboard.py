@@ -64,11 +64,20 @@ def scan_data_sources():
 
 def load_ledger_data():
     print("Loading Ledger Data...")
-    if not os.path.exists(LEDGER_PATH):
-        print(f"Warning: Ledger data not found at {LEDGER_PATH}. Mocking empty ledger.")
+    
+    # Try reconciled master ledger first, fallback to raw ledger
+    reconciled_path = os.path.join(PROJECT_ROOT, "scratch/reconciled_master_ledger.json")
+    if os.path.exists(reconciled_path):
+        print(f"Found reconciled ledger at {reconciled_path}")
+        path_to_use = reconciled_path
+    elif os.path.exists(LEDGER_PATH):
+        print(f"Found raw ledger at {LEDGER_PATH}")
+        path_to_use = LEDGER_PATH
+    else:
+        print("Warning: Ledger data file not found. Mocking empty ledger.")
         return []
     
-    with open(LEDGER_PATH, 'r', encoding='utf-8') as f:
+    with open(path_to_use, 'r', encoding='utf-8') as f:
         raw_txs = json.load(f)
         
     mapped_txs = []
@@ -130,11 +139,13 @@ def get_roof_transactions(transactions):
         v = tx.get("vendor", "").upper()
         desc = tx.get("desc", "").upper()
         check = tx.get("check", "")
+        cat = tx.get("category", "")
         
         is_direct = any(dv in v for dv in direct_vendors)
         has_kw = any(kw in desc for kw in roof_keywords)
+        is_roof_cat = (cat == "Roof Repair Project")
         
-        if (is_direct or ("RAND" in v and has_kw)) and check:
+        if (is_direct or ("RAND" in v and has_kw) or is_roof_cat) and check:
             roof_checks.add(check)
             
     roof_txs = []
@@ -142,14 +153,19 @@ def get_roof_transactions(transactions):
         v = tx.get("vendor", "").upper()
         desc = tx.get("desc", "").upper()
         check = tx.get("check", "")
+        cat = tx.get("category", "")
         
         is_selected = False
         if check in roof_checks:
             if any(x in v for x in ["NOVA", "GARDINER", "THEOBALD", "G&T", "BR DESIGN", "BRD", "TERRAIN", "RAND"]):
                 is_selected = True
+            elif cat == "Roof Repair Project":
+                is_selected = True
         elif any(dv in v for dv in direct_vendors):
             is_selected = True
         elif "RAND" in v and any(kw in desc for kw in roof_keywords):
+            is_selected = True
+        elif cat == "Roof Repair Project":
             is_selected = True
             
         if is_selected:
@@ -239,13 +255,50 @@ def main():
         print(f"Error: Template HTML not found at {TEMPLATE_PATH}.")
         return
         
-    doc_index = scan_data_sources()
-    transactions = load_ledger_data()
-    emails = load_email_data()
-    roof_txs = get_roof_transactions(transactions)
-    roof_forecast = build_forecast_data()
+    # Check if raw files exist. If not, try to parse from the existing index.html to recover data model
+    reconciled_path = os.path.join(PROJECT_ROOT, "scratch/reconciled_master_ledger.json")
+    raw_files_exist = os.path.exists(reconciled_path) or os.path.exists(LEDGER_PATH)
     
-    last_updated_str = datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
+    doc_index = None
+    transactions = None
+    emails = None
+    roof_txs = None
+    roof_forecast = None
+    last_updated_str = None
+    
+    if not raw_files_exist and os.path.exists(OUTPUT_PATH):
+        print("Raw data files not found. Attempting to parse existing index.html to recover data model...")
+        try:
+            with open(OUTPUT_PATH, 'r', encoding='utf-8') as f:
+                existing_html = f.read()
+            
+            import re
+            m_doc = re.search(r'const documentIndex\s*=\s*(\[.*?\]);', existing_html, re.DOTALL)
+            m_raw = re.search(r'const rawTransactions\s*=\s*(\[.*?\]);', existing_html, re.DOTALL)
+            m_email = re.search(r'const relevantEmails\s*=\s*(\[.*?\]);', existing_html, re.DOTALL)
+            m_roof = re.search(r'const roofTransactions\s*=\s*(\[.*?\]);', existing_html, re.DOTALL)
+            m_forecast = re.search(r'const roofForecast\s*=\s*(\[.*?\]);', existing_html, re.DOTALL)
+            m_time = re.search(r'const lastUpdatedTime\s*=\s*"(.*?)";', existing_html)
+            
+            if m_doc and m_raw and m_email and m_roof and m_forecast and m_time:
+                doc_index = json.loads(m_doc.group(1))
+                transactions = json.loads(m_raw.group(1))
+                emails = json.loads(m_email.group(1))
+                roof_txs = json.loads(m_roof.group(1))
+                roof_forecast = json.loads(m_forecast.group(1))
+                last_updated_str = m_time.group(1)
+                print("Successfully recovered data model from index.html.")
+        except Exception as e:
+            print(f"Failed to recover data from index.html: {e}")
+            
+    # Fallback to normal loading if we couldn't parse it or if raw files exist
+    if doc_index is None:
+        doc_index = scan_data_sources()
+        transactions = load_ledger_data()
+        emails = load_email_data()
+        roof_txs = get_roof_transactions(transactions)
+        roof_forecast = build_forecast_data()
+        last_updated_str = datetime.datetime.now().strftime('%Y-%m-%d %I:%M %p')
     
     # Read Template
     with open(TEMPLATE_PATH, 'r', encoding='utf-8') as f:
