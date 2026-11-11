@@ -642,6 +642,95 @@
             .eq-operator { margin: 0 auto; }
             .slide { justify-content: flex-start; padding: 1.2rem; }
         }
+
+        /* TED-TALK OPENING SLIDE ANIMATIONS & ERA ARC */
+        @keyframes fadeUpStagger {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide.active .stagger-1 { animation: fadeUpStagger 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both; }
+        .slide.active .stagger-2 { animation: fadeUpStagger 0.50s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both; }
+        .slide.active .stagger-3 { animation: fadeUpStagger 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both; }
+
+        .era-timeline {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1.15fr;
+            align-items: stretch;
+            gap: 0.65rem;
+        }
+        .era-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: var(--text-muted);
+            font-weight: 800;
+            padding: 0 0.15rem;
+        }
+        .era-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.15rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .era-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+        }
+        .era-past::before { background: var(--amber); }
+        .era-now::before { background: var(--ruby); }
+        .era-future::before { background: linear-gradient(90deg, var(--primary-light), var(--emerald)); }
+        .era-now {
+            border-color: rgba(239, 68, 68, 0.45);
+            background: linear-gradient(165deg, rgba(239, 68, 68, 0.11) 0%, var(--card) 70%);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.12);
+        }
+        .era-future {
+            border-color: rgba(16, 185, 129, 0.45);
+            background: linear-gradient(165deg, rgba(16, 185, 129, 0.11) 0%, var(--card) 70%);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.12);
+        }
+        .era-years {
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .era-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0.2rem 0 0.35rem;
+        }
+        .era-metric {
+            font-family: var(--font-mono);
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0.25rem 0;
+        }
+        .era-BTag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            width: fit-content;
+            margin-top: 0.35rem;
+        }
+        @media (max-width: 1024px) {
+            .era-timeline { grid-template-columns: 1fr; }
+            .era-arrow { transform: rotate(90deg); margin: 0.2rem auto; }
+        }
+
     </style>
 </head>
 <body>
@@ -669,17 +758,18 @@
             </div>
 
             <nav class="nav-pills">
-                <button class="nav-pill active" onclick="goToSlide(1)">1. Two Paths</button>
-                <button class="nav-pill" onclick="goToSlide(2)">2. Roof & Terrace</button>
-                <button class="nav-pill" onclick="goToSlide(3)">3. 2027 Costs</button>
-                <button class="nav-pill" onclick="goToSlide(4)">4. 5-Yr Repairs</button>
-                <button class="nav-pill highlight-pill" onclick="goToSlide(5)">⚡ 5. Interactive Option Toggle</button>
-                <button class="nav-pill" onclick="goToSlide(6)">6. Recommendation</button>
-                <button class="nav-pill" onclick="goToSlide(7)">7. Project Appendix (12)</button>
+                <button class="nav-pill active" onclick="goToSlide(1)">1. Our 15-Yr Story</button>
+                <button class="nav-pill" onclick="goToSlide(2)">2. Two Paths</button>
+                <button class="nav-pill" onclick="goToSlide(3)">3. Roof & Terrace</button>
+                <button class="nav-pill" onclick="goToSlide(4)">4. 2027 Costs</button>
+                <button class="nav-pill" onclick="goToSlide(5)">5. 5-Yr Repairs</button>
+                <button class="nav-pill highlight-pill" onclick="goToSlide(6)">⚡ 6. Interactive Toggle</button>
+                <button class="nav-pill" onclick="goToSlide(7)">7. Bottom Line</button>
+                <button class="nav-pill" onclick="goToSlide(8)">8. Appendix (12)</button>
             </nav>
 
             <div class="header-right">
-                <span class="slide-counter" id="slideCounter">Slide 1 of 18</span>
+                <span class="slide-counter" id="slideCounter">Slide 1 of 19</span>
                 <button class="icon-btn" onclick="toggleGridOverview()" title="All Slides (G)">⊞ All Slides</button>
                 <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen (F)">⛶</button>
             </div>
@@ -693,12 +783,125 @@
         <main id="slideViewport">
 
             <!-- ==========================================================
-                 SLIDE 1: THE TWO CHOICES FOR 2027–2031 (30s Grasp)
+                 SLIDE 1: TED-TALK STORY OPENER — BORROWING FROM OUR FUTURE
                  ========================================================== -->
             <section class="slide active" id="slide-1" data-slide="1">
                 <div class="slide-inner">
+                    <div class="stagger-1">
+                        <span class="slide-top-tag tag-amber">🎙️ The Big Picture • Executive Story 1 of 7</span>
+                        <div class="headline-row">
+                            <div>
+                                <h1 class="slide-headline">For 15 Years, We Borrowed From Our Future. Now the Bill Is Here.</h1>
+                                <p class="slide-subheadline">Low monthly charges felt great—until $6.5M in assessments hit all at once. Raising common charges now is how we stop the shock.</p>
+                            </div>
+                            <span class="read-time-pill">⏱ 30s Story Arc</span>
+                        </div>
+                    </div>
+
+                    <!-- 3-ACT VISUAL STORY TIMELINE -->
+                    <div class="era-timeline stagger-2">
+                        <!-- ERA 1 -->
+                        <div class="era-card era-past">
+                            <div>
+                                <div class="era-years c-amber">Act I • 2010 – 2023 (15 Years)</div>
+                                <div class="era-title">Borrowing From the Future</div>
+                                <div class="era-metric c-amber">$0<span style="font-size:0.9rem; color:var(--text-muted);"> /mo saved</span></div>
+                            </div>
+                            <div style="font-size:0.86rem; color:var(--text-secondary); margin:0.35rem 0;">
+                                Enjoyed artificially low common charges & minimal capital work while roofs, pipes & boilers aged 15 years.
+                            </div>
+                            <span class="era-BTag tag-amber">⏳ Deferred the Inevitable</span>
+                        </div>
+
+                        <div class="era-arrow">→</div>
+
+                        <!-- ERA 2 -->
+                        <div class="era-card era-now">
+                            <div>
+                                <div class="era-years c-ruby">Act II • 2024 – 2026 (Today)</div>
+                                <div class="era-title">The Assessment Reckoning</div>
+                                <div class="era-metric c-ruby">$24,310<span style="font-size:0.9rem; color:var(--text-muted);"> /avg unit</span></div>
+                            </div>
+                            <div style="font-size:0.86rem; color:var(--text-secondary); margin:0.35rem 0;">
+                                Zero reserves forced <strong>$6.50M</strong> in painful lump-sum assessments ($4.0M in 2024 + $2.5M in 2026) to save the roof & facade.
+                            </div>
+                            <span class="era-BTag tag-ruby">⚡ Painful Whiplash</span>
+                        </div>
+
+                        <div class="era-arrow">→</div>
+
+                        <!-- ERA 3 -->
+                        <div class="era-card era-future">
+                            <div>
+                                <div class="era-years c-emerald">Act III • 2027 – 2031 (Our Choice)</div>
+                                <div class="era-title">Stabilize Our Spend</div>
+                                <div class="era-metric c-emerald">2 Ways<span style="font-size:0.9rem; color:var(--text-muted);"> to build reserves</span></div>
+                            </div>
+                            <div style="font-size:0.86rem; color:var(--text-secondary); margin:0.35rem 0;">
+                                Raise common charges to fund our <strong>$2.77M</strong> next 5-year repairs—either <strong>phased in</strong> (with smaller assessments) or <strong>fully funded</strong> ($0 assessments).
+                            </div>
+                            <span class="era-BTag tag-emerald">🛡️ Predictable Stability</span>
+                        </div>
+                    </div>
+
+                    <!-- DATA PROOF: 20-YEAR CHART + 3-PATH MINI TABLE -->
+                    <div class="grid-split-60-40 stagger-3">
+                        <div class="v-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+                                <span class="stat-label">Annual Cost per Avg Unit (2012–2031): Why Low Charges Caused Giant Spikes</span>
+                                <span style="font-family:var(--font-mono); font-size:0.74rem; color:var(--ruby-light);">Red = Assessment Shock</span>
+                            </div>
+                            <div style="height:175px; position:relative;">
+                                <canvas id="chartStoryArc"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="v-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <div class="stat-label" style="margin-bottom:0.35rem;">How We Handle the 2027–2031 Transition (Avg Unit)</div>
+                                <table class="clean-table">
+                                    <thead>
+                                        <tr>
+                                            <th>2027–2031 Path</th>
+                                            <th class="num">2027 Monthly</th>
+                                            <th class="num">5-Yr Assessments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="c-ruby">⚡ Keep Assessing</span> <span style="font-size:0.75rem; color:var(--text-muted);">($0 Reserve)</span></td>
+                                            <td class="num">$1,244/mo</td>
+                                            <td class="num c-ruby">$8,351 (5 bills)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="c-emerald">🪜 Phased Ramp</span> <span style="font-size:0.75rem; color:var(--text-muted);">(+6% Reserve)</span></td>
+                                            <td class="num c-emerald">$1,319/mo</td>
+                                            <td class="num c-amber">$3,753 (Transition)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="c-indigo">🏛️ Full Reserve</span> <span style="font-size:0.75rem; color:var(--text-muted);">(+11.5% Reserve)</span></td>
+                                            <td class="num c-indigo">$1,387/mo</td>
+                                            <td class="num c-emerald"><strong>$0 (Done!)</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.04); padding:0.55rem 0.75rem; border-radius:8px; font-size:0.81rem; color:var(--text-secondary);">
+                                💡 <strong>The Tradeoff:</strong> Phasing in the hike softens the monthly jump (+$75/mo), yet still requires smaller assessments while reserves catch up.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================
+                 SLIDE 1: THE TWO CHOICES FOR 2027–2031 (30s Grasp)
+                 ========================================================== -->
+            <section class="slide" id="slide-2" data-slide="2">
+                <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-indigo">🏛️ Executive Story • 1 of 6</span>
+                        <span class="slide-top-tag tag-indigo">🏛️ Executive Story • 2 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">How Should We Pay for Building Repairs Over the Next 5 Years?</h1>
@@ -794,10 +997,10 @@
             <!-- ==========================================================
                  SLIDE 2: WHAT WE JUST ACCOMPLISHED ($6.56M ROOF & TERRACE)
                  ========================================================== -->
-            <section class="slide" id="slide-2" data-slide="2">
+            <section class="slide" id="slide-3" data-slide="3">
                 <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-emerald">🏗️ Executive Story • 2 of 6</span>
+                        <span class="slide-top-tag tag-emerald">🏗️ Executive Story • 3 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">Good News: Our $6.56M Roof, Facade & Terrace Are Already Funded</h1>
@@ -875,10 +1078,10 @@
             <!-- ==========================================================
                  SLIDE 3: WHY 2027 OPERATING COSTS ARE UP +12.3%
                  ========================================================== -->
-            <section class="slide" id="slide-3" data-slide="3">
+            <section class="slide" id="slide-4" data-slide="4">
                 <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-amber">🔥 Executive Story • 3 of 6</span>
+                        <span class="slide-top-tag tag-amber">🔥 Executive Story • 4 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">Why 2027 Daily Operating Costs Are Up +12.3% ($407k Gap)</h1>
@@ -979,10 +1182,10 @@
             <!-- ==========================================================
                  SLIDE 4: WHAT NEEDS FIXING NEXT ($2.77M OVER 2027–2031)
                  ========================================================== -->
-            <section class="slide" id="slide-4" data-slide="4">
+            <section class="slide" id="slide-5" data-slide="5">
                 <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-cyan">🛠️ Executive Story • 4 of 6</span>
+                        <span class="slide-top-tag tag-cyan">🛠️ Executive Story • 5 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">We Have $2.77M in Known Repairs Over the Next 5 Years</h1>
@@ -1052,7 +1255,7 @@
                         <div class="v-card">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
                                 <span class="stat-label">5-Year Capital Spend Timeline ($2,767,510 Total)</span>
-                                <span style="font-size:0.78rem; color:var(--text-muted);">Click Appendix (Slide 7) for project-by-project quotes</span>
+                                <span style="font-size:0.78rem; color:var(--text-muted);">Click Appendix (Slide 8) for project-by-project quotes</span>
                             </div>
                             <div style="height:175px; position:relative;">
                                 <canvas id="chartCapitalSchedule"></canvas>
@@ -1105,10 +1308,10 @@
             <!-- ==========================================================
                  SLIDE 5: INTERACTIVE OPTION TOGGLE (CENTERPIECE UX/UI)
                  ========================================================== -->
-            <section class="slide" id="slide-5" data-slide="5">
+            <section class="slide" id="slide-6" data-slide="6">
                 <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-emerald">⚡ Interactive Strategy Switcher • 5 of 6</span>
+                        <span class="slide-top-tag tag-emerald">⚡ Interactive Strategy Switcher • 6 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">Toggle the Two Strategies: Assessment-Heavy vs. Reserve-Funded</h1>
@@ -1126,8 +1329,8 @@
                                 <span style="font-size:0.74rem; opacity:0.85;">($0 Reserve)</span>
                             </button>
                             <button id="toggleOpt2a" class="mode-btn active-opt2a" onclick="selectStrategyMode('opt2a')">
-                                <span>🛡️ Option 2A: Balanced Reserve</span>
-                                <span style="font-size:0.74rem; opacity:0.9;">(+6% Reserve)</span>
+                                <span>🛡️ Option 2A: Phased Reserve</span>
+                                <span style="font-size:0.74rem; opacity:0.9;">(+6% + Small Assess)</span>
                             </button>
                             <button id="toggleOpt2b" class="mode-btn" onclick="selectStrategyMode('opt2b')">
                                 <span>🏛️ Option 2B: Zero Assessments</span>
@@ -1237,10 +1440,10 @@
             <!-- ==========================================================
                  SLIDE 6: WHY OPTION 2 WINS & NEXT STEPS (30s Bottom Line)
                  ========================================================== -->
-            <section class="slide" id="slide-6" data-slide="6">
+            <section class="slide" id="slide-7" data-slide="7">
                 <div class="slide-inner">
                     <div>
-                        <span class="slide-top-tag tag-emerald">🏆 Executive Story • 6 of 6</span>
+                        <span class="slide-top-tag tag-emerald">🏆 Executive Story • 7 of 7</span>
                         <div class="headline-row">
                             <div>
                                 <h1 class="slide-headline">The Bottom Line: Why Saving Monthly Beats Surprise Assessments</h1>
@@ -1304,7 +1507,7 @@
 
                     <div class="takeaway-banner">
                         <span>🔍 Want to inspect the engineering details and vendor quotes for each of the 12 projects?</span>
-                        <button class="nav-btn nav-btn-primary" onclick="goToSlide(7)">Explore the 12-Project Appendix →</button>
+                        <button class="nav-btn nav-btn-primary" onclick="goToSlide(8)">Explore the 12-Project Appendix →</button>
                     </div>
                 </div>
             </section>
@@ -1313,7 +1516,7 @@
                  SLIDES 7–18: SIMPLIFIED 12-PROJECT APPENDIX (30s Cards)
                  ========================================================== -->
             <!-- A1: Heating Plant -->
-            <section class="slide" id="slide-7" data-slide="7">
+            <section class="slide" id="slide-8" data-slide="8">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-emerald">🔥 Appendix Project 1 of 12 • High-ROI Energy</span>
@@ -1340,7 +1543,7 @@
             </section>
 
             <!-- A2: LL97 -->
-            <section class="slide" id="slide-8" data-slide="8">
+            <section class="slide" id="slide-9" data-slide="9">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-ruby">🌿 Appendix Project 2 of 12 • Mandatory NYC Law</span>
@@ -1367,7 +1570,7 @@
             </section>
 
             <!-- A3: Skylight & Exterior Sealants -->
-            <section class="slide" id="slide-9" data-slide="9">
+            <section class="slide" id="slide-10" data-slide="10">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-ruby">💧 Appendix Project 3 of 12 • Active Water Leak Cure</span>
@@ -1394,7 +1597,7 @@
             </section>
 
             <!-- A4: 53rd St Sidewalk -->
-            <section class="slide" id="slide-10" data-slide="10">
+            <section class="slide" id="slide-11" data-slide="11">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-ruby">🚧 Appendix Project 4 of 12 • Mandatory NYC DOT Compliance</span>
@@ -1421,7 +1624,7 @@
             </section>
 
             <!-- A5: Electrical -->
-            <section class="slide" id="slide-11" data-slide="11">
+            <section class="slide" id="slide-12" data-slide="12">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-ruby">⚡ Appendix Project 5 of 12 • Fire Safety & Resident Heat</span>
@@ -1448,7 +1651,7 @@
             </section>
 
             <!-- A6: Backup Generator -->
-            <section class="slide" id="slide-12" data-slide="12">
+            <section class="slide" id="slide-13" data-slide="13">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-amber">🔋 Appendix Project 6 of 12 • Blackout Resilience</span>
@@ -1475,7 +1678,7 @@
             </section>
 
             <!-- A7: Elevators -->
-            <section class="slide" id="slide-13" data-slide="13">
+            <section class="slide" id="slide-14" data-slide="14">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-cyan">🛗 Appendix Project 7 of 12 • Vertical Transportation</span>
@@ -1502,7 +1705,7 @@
             </section>
 
             <!-- A8: Fire Standpipe -->
-            <section class="slide" id="slide-14" data-slide="14">
+            <section class="slide" id="slide-15" data-slide="15">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-ruby">🚒 Appendix Project 8 of 12 • Mandatory FDNY Code</span>
@@ -1529,7 +1732,7 @@
             </section>
 
             <!-- A9: Plumbing Risers -->
-            <section class="slide" id="slide-15" data-slide="15">
+            <section class="slide" id="slide-16" data-slide="16">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-cyan">🔧 Appendix Project 9 of 12 • Plumbing & Mechanical</span>
@@ -1556,7 +1759,7 @@
             </section>
 
             <!-- A10: Security & Intercom -->
-            <section class="slide" id="slide-16" data-slide="16">
+            <section class="slide" id="slide-17" data-slide="17">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-indigo">🔒 Appendix Project 10 of 12 • Security & Intercom</span>
@@ -1583,7 +1786,7 @@
             </section>
 
             <!-- A11: Hallways & Carpets -->
-            <section class="slide" id="slide-17" data-slide="17">
+            <section class="slide" id="slide-18" data-slide="18">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-emerald">🎨 Appendix Project 11 of 12 • Common Areas & Hallways</span>
@@ -1610,7 +1813,7 @@
             </section>
 
             <!-- A12: Roof/Terrace & Future Amenities -->
-            <section class="slide" id="slide-18" data-slide="18">
+            <section class="slide" id="slide-19" data-slide="19">
                 <div class="slide-inner">
                     <div>
                         <span class="slide-top-tag tag-emerald">🌿 Appendix Project 12 of 12 • Roof Terrace & Amenities</span>
@@ -1636,7 +1839,7 @@
                     <div class="takeaway-banner">
                         <span>🎉 <strong>Ready to compare the numbers again?</strong> Jump back to the Interactive Strategy Toggle or Title Slide anytime.</span>
                         <div style="display:flex; gap:0.5rem;">
-                            <button class="nav-btn" onclick="goToSlide(5)">⚡ Interactive Toggle (Slide 5)</button>
+                            <button class="nav-btn" onclick="goToSlide(6)">⚡ Interactive Toggle (Slide 6)</button>
                             <button class="nav-btn nav-btn-primary" onclick="goToSlide(1)">🏛️ Return to Slide 1</button>
                         </div>
                     </div>
@@ -1666,7 +1869,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
                 <h2 style="font-size:1.5rem; font-weight:800;">All 18 Slides — Quick Jump</h2>
-                <p style="color:var(--text-muted); font-size:0.88rem;">Slides 1–6: Simplified Executive Story • Slides 7–18: 12 Capital Project Cards</p>
+                <p style="color:var(--text-muted); font-size:0.88rem;">Slides 1–7: Simplified Executive Story • Slides 8–19: 12 Capital Project Cards</p>
             </div>
             <button class="icon-btn" onclick="toggleGridOverview()" style="padding:0.5rem 1rem;">✕ Close (G)</button>
         </div>
@@ -1675,7 +1878,7 @@
 
     <script>
         let currentSlide = 1;
-        const totalSlides = 18;
+        const totalSlides = 19;
         let isAuthorized = false;
         let chartInstances = {};
 
@@ -1698,24 +1901,25 @@
         };
 
         const SLIDE_TITLES = [
-            "1. Two Paths for 2027–2031",
-            "2. $6.56M Roof & Terrace Done/Funded",
-            "3. Why 2027 Operating Costs Rise +12.3%",
-            "4. $2.77M Known 5-Year Repairs",
-            "5. ⚡ Interactive Strategy Toggle",
-            "6. Recommendation & Dec 17 Roadmap",
-            "7. P01: Boiler Dual-Fuel Gas Conversion",
-            "8. P02: Local Law 97 Carbon Study",
-            "9. P03: 2nd-Fl Skylight & Sealants",
-            "10. P04: 53rd St Sidewalk Replacement",
-            "11. P05: Electrical & Bath Heaters",
-            "12. P06: Emergency Backup Generator",
-            "13. P07: Passenger Elevator Upgrades",
-            "14. P08: FDNY 5-Yr Standpipe Test",
-            "15. P09: Steam Joints & Drain Stacks",
-            "16. P10: Security Doors & Intercom",
-            "17. P11: Hallway Carpets & Finishes",
-            "18. P12: Roof Terrace & Amenities"
+            "1. 🎙️ 15-Year Story: Borrowing From Our Future",
+            "2. Two Paths for 2027–2031",
+            "3. $6.56M Roof & Terrace Done/Funded",
+            "4. Why 2027 Operating Costs Rise +12.3%",
+            "5. $2.77M Known 5-Year Repairs",
+            "6. ⚡ Interactive Strategy Toggle",
+            "7. Recommendation & Dec 17 Roadmap",
+            "8. P01: Boiler Dual-Fuel Gas Conversion",
+            "9. P02: Local Law 97 Carbon Study",
+            "10. P03: 2nd-Fl Skylight & Sealants",
+            "11. P04: 53rd St Sidewalk Replacement",
+            "12. P05: Electrical & Bath Heaters",
+            "13. P06: Emergency Backup Generator",
+            "14. P07: Passenger Elevator Upgrades",
+            "15. P08: FDNY 5-Yr Standpipe Test",
+            "16. P09: Steam Joints & Drain Stacks",
+            "17. P10: Security Doors & Intercom",
+            "18. P11: Hallway Carpets & Finishes",
+            "19. P12: Roof Terrace & Amenities"
         ];
 
         function buildThumbGrid() {
@@ -1726,8 +1930,8 @@
                 const div = document.createElement('div');
                 div.className = 'slide-thumb' + (n === currentSlide ? ' active' : '');
                 div.innerHTML = `
-                    <div style="font-family:var(--font-mono); font-size:0.75rem; color:${n <= 6 ? 'var(--emerald-light)' : 'var(--primary-light)'}; margin-bottom:0.25rem;">
-                        ${n <= 6 ? 'EXECUTIVE STORY' : 'PROJECT APPENDIX'}
+                    <div style="font-family:var(--font-mono); font-size:0.75rem; color:${n <= 7 ? 'var(--emerald-light)' : 'var(--primary-light)'}; margin-bottom:0.25rem;">
+                        ${n <= 7 ? 'EXECUTIVE STORY' : 'PROJECT APPENDIX'}
                     </div>
                     <div style="font-weight:700; font-size:0.92rem; color:#fff;">${title}</div>
                 `;
@@ -1780,10 +1984,10 @@
 
             const pills = document.querySelectorAll('.nav-pill');
             pills.forEach(p => p.classList.remove('active'));
-            if (currentSlide <= 6 && pills[currentSlide - 1]) {
+            if (currentSlide <= 7 && pills[currentSlide - 1]) {
                 pills[currentSlide - 1].classList.add('active');
-            } else if (currentSlide >= 7 && pills[6]) {
-                pills[6].classList.add('active');
+            } else if (currentSlide >= 8 && pills[7]) {
+                pills[7].classList.add('active');
             }
             buildThumbGrid();
         }
@@ -1955,7 +2159,56 @@
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
-            // Slide 2 Doughnut
+            // Slide 1: 20-Year Story Arc Chart (Common Charges vs. Assessment Spikes per Avg Unit)
+            const ctxStory = document.getElementById('chartStoryArc');
+            if (ctxStory) {
+                chartInstances.story = new Chart(ctxStory, {
+                    type: 'bar',
+                    data: {
+                        labels: ['2012–19 Avg', '2020–23 Avg', '2024', '2025', '2026', '2027 (Est)', '2028 (Est)', '2029–31 Avg'],
+                        datasets: [
+                            {
+                                label: 'Base Common Charges ($/yr)',
+                                data: [10400, 11600, 12197, 12197, 13295, 14930, 15378, 16319],
+                                backgroundColor: '#6366f1',
+                                stack: 'arc',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Reserve Savings Line (+6% Phased)',
+                                data: [0, 0, 0, 0, 0, 896, 923, 979],
+                                backgroundColor: '#10b981',
+                                stack: 'arc',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Painful Special Assessments ($/yr)',
+                                data: [0, 0, 14959, 0, 9350, 534, 1802, 472],
+                                backgroundColor: '#ef4444',
+                                stack: 'arc',
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, color: '#cbd5e1' } }
+                        },
+                        scales: {
+                            y: {
+                                stacked: true,
+                                grid: { color: 'rgba(255,255,255,0.06)' },
+                                ticks: { callback: v => '$' + (v/1000) + 'k' }
+                            },
+                            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } }
+                        }
+                    }
+                });
+            }
+
+            // Slide 3 Doughnut
             const ctxHist = document.getElementById('chartHistDisbursements');
             if (ctxHist) {
                 chartInstances.hist = new Chart(ctxHist, {
