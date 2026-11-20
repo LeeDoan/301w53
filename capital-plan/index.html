@@ -731,9 +731,9 @@
         <section class="thesis-box" id="thesis">
             <div class="thesis-title">Executive Decision Thesis (90-Second Summary)</div>
             <ul class="thesis-grid">
-                <li><strong>1. Operating Inflation Is Covered (+12.30% Baseline):</strong> 2027 daily costs require <strong>+$407k (+12.30%)</strong> to balance operations (driven by #2 heating oil, 32BJ union labor, and utilities/insurance). That baseline keeps the building running—leaving <strong>$0/month</strong> funded for upcoming capital work.</li>
-                <li><strong>2. Add a Dedicated +6.0% Capital Reserve Line:</strong> Funding reserves monthly (~<strong>$66/mo</strong> avg unit) costs virtually the same over 5 years as pay-as-you-go assessments—while cutting surprise bills by <strong>55%</strong> on the full $2.77M plan, or eliminating them <strong>100% ($0)</strong> if discretionary projects are staged.</li>
-                <li><strong>3. Protect Resale Values &amp; Mortgageability:</strong> After $6.5M in 2024–2026 assessments, recurring special assessments raise red flags with Fannie Mae and buyer lenders. A clean, transparent monthly reserve line stabilizes cash flow and meets underwriting standards.</li>
+                <li><strong>1. 2027 Is Locked (+12.30% Operating Baseline):</strong> 2027 daily costs require <strong>+$407k (+12.30%)</strong> to balance operations ($0 reserve added in 2027), giving owners breathing room while the existing terrace assessment expires in April 2027.</li>
+                <li><strong>2. Phase In a +6.0% Capital Reserve Starting 2028:</strong> Beginning January 2028, adding a dedicated <strong>+6.0% Reserve line</strong> (~<strong>$75/mo</strong> avg unit on top of 3% operating inflation) costs the <em>exact same</em> over 5 years as pay-as-you-go—while cutting 2028–2031 surprise assessments by <strong>51%–57%</strong>.</li>
+                <li><strong>3. Protect Resale Values &amp; Mortgageability:</strong> After $6.5M in 2024–2026 assessments, recurring special assessments raise red flags with Fannie Mae and buyer lenders. Phasing in a clean monthly reserve line in 2028 stabilizes cash flow without double-hitting owners in 2027.</li>
             </ul>
         </section>
 
@@ -813,18 +813,18 @@
         <section class="card" id="simulator">
             <div class="card-header">
                 <div>
-                    <div class="card-title">2. Interactive 5-Year Funding Strategy Simulator (2027–2031)</div>
-                    <div class="card-subtitle">All percentages are additive off the 2026 Common Charge base ($3,309,734/yr) · Uses $355k reserve cushion above the $1.0M floor before any assessment</div>
+                    <div class="card-title">2. Interactive 5-Year Simulator: 2027 Fixed (+12.30% Op) → 2028 Reserve Phase-In</div>
+                    <div class="card-subtitle">2027 is locked at +12.30% operating-only ($0 reserve) · Choose whether to stay pay-as-you-go or phase in a Capital Reserve line starting January 2028</div>
                 </div>
             </div>
 
             <div class="sim-controls">
                 <div class="control-group">
-                    <span class="control-label">1. Reserve Funding Strategy</span>
+                    <span class="control-label">1. 2028–2031 Reserve Strategy (Starts Jan 2028)</span>
                     <div class="btn-group">
                         <button class="btn-toggle" id="btnOpt1" onclick="setState('strategy','opt1')">Opt 1: Pay-As-You-Go (+0% Res)</button>
-                        <button class="btn-toggle active-blue" id="btnOpt2a" onclick="setState('strategy','opt2a')">Opt 2A: Phased Reserve (+6.0% Res)</button>
-                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Full Reserve (+12.5% Res)</button>
+                        <button class="btn-toggle active-blue" id="btnOpt2a" onclick="setState('strategy','opt2a')">Opt 2A: Phased Reserve (+6.0% in 2028)</button>
+                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Full Reserve (+12.5% in 2028)</button>
                     </div>
                 </div>
 
@@ -849,30 +849,30 @@
             <div class="card-body">
                 <!-- Honest Transition Notice -->
                 <div class="callout-note">
-                    <strong>Transition Timing Note (Jan–Apr 2027):</strong> The existing <strong>$2.5M Rooftop Terrace Assessment</strong> ($1,169/mo for an avg unit) runs through <strong>April 2027</strong> regardless of which option is chosen. The monthly figures below show ongoing 2027 recurring charges; starting May 2027, the terrace assessment expires completely.
+                    <strong>Phased Rollout (2027 → 2028):</strong> In <strong>2027</strong>, common charges rise <strong>+12.30%</strong> for daily operations only ($0 reserve line) while the existing $2.5M Rooftop Terrace Assessment expires in April 2027. Starting <strong>January 2028</strong>, the Board phases in the selected Capital Reserve line (on top of 3% normal operating inflation).
                 </div>
 
                 <!-- 4 Wallet KPI Boxes -->
                 <div class="wallet-strip">
+                    <div class="wallet-box">
+                        <div class="wallet-label">2027 Monthly CC (Locked)</div>
+                        <div class="wallet-val" id="w2027Mo">$1,244/mo</div>
+                        <div class="wallet-note" id="w2027Note">+12.30% Op only · $0 Reserve</div>
+                    </div>
                     <div class="wallet-box highlight">
-                        <div class="wallet-label">2027 Total CC Increase</div>
-                        <div class="wallet-val" id="wPermPct">+18.30%</div>
-                        <div class="wallet-note" id="wPermNote">12.30% Operating + 6.00% Reserve</div>
+                        <div class="wallet-label">2028 Monthly CC (Phase-In)</div>
+                        <div class="wallet-val" id="wTotalMo">$1,356/mo</div>
+                        <div class="wallet-note" id="wPermNote">+9.0% vs 2027 (3% Op + 6.0% Res)</div>
                     </div>
                     <div class="wallet-box">
-                        <div class="wallet-label">2027 New Monthly CC</div>
-                        <div class="wallet-val" id="wTotalMo">$1,311/mo</div>
-                        <div class="wallet-note" id="wTotalNote">Up from $1,108/mo (+$203/mo)</div>
+                        <div class="wallet-label">2028–2031 Assessments</div>
+                        <div class="wallet-val" id="wAssess">$3,588</div>
+                        <div class="wallet-note" id="wAssessNote">Cut by 51% vs. Opt 1 ($7,343)</div>
                     </div>
                     <div class="wallet-box">
-                        <div class="wallet-label">5-Yr New Special Assessments</div>
-                        <div class="wallet-val" id="wAssess">$3,692</div>
-                        <div class="wallet-note" id="wAssessNote">Cut by 56% vs. Opt 1 ($8,351)</div>
-                    </div>
-                    <div class="wallet-box">
-                        <div class="wallet-label">5-Yr All-In Cost (CC + Assess)</div>
-                        <div class="wallet-val" id="wFiveYr">$87,742</div>
-                        <div class="wallet-note" id="wFiveYrNote">Within +$2/mo of Pay-As-You-Go</div>
+                        <div class="wallet-label">5-Yr All-In Cost (2027–31)</div>
+                        <div class="wallet-val" id="wFiveYr">$88,094</div>
+                        <div class="wallet-note" id="wFiveYrNote">Literally -$7 vs. Pay-As-You-Go</div>
                     </div>
                 </div>
 
@@ -1055,21 +1055,22 @@
         updateSimulator();
     }
 
-    function simulate(resPct, capSchedule) {
+    function simulate(resPct2028, capSchedule) {
         let bal = MODEL.startReserve;
         const assessments = [];
         const endBalances = [];
         let totalAssess = 0;
+        let assess28to31 = 0;
         let totalAllInBuilding = 0;
 
-        // Annual reserve contribution starts at resPct% of 2026 Base CC (exact additive!) and grows 3%/yr
-        const res2027 = MODEL.baseCC2026 * (resPct / 100);
-        const opTotal2027 = MODEL.baseCC2026 + MODEL.opGap2027; // Total operating revenue needed in 2027
+        // 2027 is locked at +12.30% Operating Only ($0 reserve).
+        // Reserve line phases in starting Jan 2028 (i >= 1) as resPct2028% of 2027 CC, growing 3%/yr.
+        const opTotal2027 = MODEL.baseCC2026 + MODEL.opGap2027;
+        const res2028 = opTotal2027 * (resPct2028 / 100);
 
         for (let i = 0; i < 5; i++) {
-            const growthMult = Math.pow(1 + MODEL.opGrowth, i);
-            const opYear = opTotal2027 * growthMult;
-            const resIn = res2027 * growthMult;
+            const opYear = opTotal2027 * Math.pow(1 + MODEL.opGrowth, i);
+            const resIn = (i === 0) ? 0 : res2028 * Math.pow(1 + MODEL.opGrowth, i - 1);
             const interest = bal * MODEL.interestRate;
             const preAssess = bal + interest + resIn - capSchedule[i];
             let assess = 0;
@@ -1082,10 +1083,11 @@
             assessments.push(assess);
             endBalances.push(bal);
             totalAssess += assess;
+            if (i >= 1) assess28to31 += assess;
             totalAllInBuilding += (opYear + resIn + assess);
         }
 
-        return { assessments, endBalances, totalAssess, totalAllInBuilding, res2027 };
+        return { assessments, endBalances, totalAssess, assess28to31, totalAllInBuilding };
     }
 
     const fmt$ = n => '$' + Math.round(n).toLocaleString();
@@ -1103,62 +1105,61 @@
         const activeSim = state.strategy === 'opt1' ? sim1 : (state.strategy === 'opt2a' ? sim2a : sim2b);
         const activeResPct = RES_PCT[state.strategy];
 
-        const baseOpPct = 12.30;
-        const totalPct = baseOpPct + activeResPct;
-
         const mo2026 = (MODEL.baseCC2026 * u) / 12;
-        const moTotal2027 = mo2026 * (1 + totalPct / 100);
+        const mo2027 = ((MODEL.baseCC2026 + MODEL.opGap2027) * u) / 12;
+        const mo2028 = mo2027 * (1 + MODEL.opGrowth + activeResPct / 100);
+        const pct2028 = 3.0 + activeResPct;
 
-        const uAssessActive = activeSim.totalAssess * u;
-        const uAssess1 = sim1.totalAssess * u;
+        const uAssess28Active = activeSim.assess28to31 * u;
+        const uAssess28Opt1 = sim1.assess28to31 * u;
         const uFiveYrActive = activeSim.totalAllInBuilding * u;
         const uFiveYr1 = sim1.totalAllInBuilding * u;
-        const diffPerMo = (uFiveYrActive - uFiveYr1) / 60;
+        const diff5Yr = uFiveYrActive - uFiveYr1;
 
         // Update Wallet KPIs
-        document.getElementById('wPermPct').textContent = '+' + totalPct.toFixed(2) + '%';
+        document.getElementById('w2027Mo').textContent = fmt$(mo2027) + '/mo';
+        document.getElementById('w2027Note').textContent =
+            `+12.30% Op only (from ${fmt$(mo2026)}/mo) · $0 Res`;
+
+        document.getElementById('wTotalMo').textContent = fmt$(mo2028) + '/mo';
         document.getElementById('wPermNote').textContent =
-            `12.30% Operating + ${activeResPct.toFixed(1)}% Reserve`;
+            `+${pct2028.toFixed(1)}% vs 2027 (3.0% Op + ${activeResPct.toFixed(1)}% Res)`;
 
-        document.getElementById('wTotalMo').textContent = fmt$(moTotal2027) + '/mo';
-        document.getElementById('wTotalNote').textContent =
-            `Up from ${fmt$(mo2026)}/mo (+${fmt$(moTotal2027 - mo2026)}/mo)`;
-
-        document.getElementById('wAssess').textContent = fmt$(uAssessActive);
-        if (uAssess1 > 0) {
-            const pctCut = Math.round(((uAssess1 - uAssessActive) / uAssess1) * 100);
+        document.getElementById('wAssess').textContent = fmt$(uAssess28Active);
+        if (uAssess28Opt1 > 0) {
+            const pctCut = Math.round(((uAssess28Opt1 - uAssess28Active) / uAssess28Opt1) * 100);
             document.getElementById('wAssessNote').textContent = state.strategy === 'opt1'
-                ? `Baseline pay-as-you-go (${sim1.assessments.filter(x => x > 100).length} bills)`
-                : (uAssessActive < 1 ? `100% eliminated (saves ${fmt$(uAssess1)})` : `Cut by ${pctCut}% vs. Opt 1 (${fmt$(uAssess1)})`);
+                ? `Baseline pay-as-you-go (2028–31)`
+                : (uAssess28Active < 1 ? `100% eliminated (saves ${fmt$(uAssess28Opt1)})` : `Cut by ${pctCut}% vs. Opt 1 (${fmt$(uAssess28Opt1)})`);
         } else {
-            document.getElementById('wAssessNote').textContent = 'No new assessments required';
+            document.getElementById('wAssessNote').textContent = 'No 2028–31 assessments required';
         }
 
         document.getElementById('wFiveYr').textContent = fmt$(uFiveYrActive);
-        const sign = diffPerMo >= 0 ? '+' : '-';
+        const sign = diff5Yr >= 0 ? '+' : '-';
         document.getElementById('wFiveYrNote').textContent = state.strategy === 'opt1'
-            ? 'Baseline 5-year all-in out-of-pocket'
-            : `${sign}${fmt$(Math.abs(diffPerMo))}/mo vs. Opt 1 (${fmt$(uFiveYr1)})`;
+            ? 'Baseline 5-yr all-in (incl. 2027)'
+            : `${sign}${fmt$(Math.abs(diff5Yr))} total vs. Opt 1 (${fmt$(uFiveYr1)})`;
 
         // Update Comparison Table
         const rows = [
-            ['2027 Total CC Increase (incl. 12.30% Op)',
-                `+12.30%`,
-                `<span class="pos">+18.30%</span>`,
-                `+24.80%`],
-            ['2027 New Monthly Common Charge',
-                fmt$(mo2026 * 1.1230) + '/mo',
-                `<strong>${fmt$(mo2026 * 1.1830)}/mo</strong>`,
-                fmt$(mo2026 * 1.2480) + '/mo'],
-            ['Monthly Delta vs. 2026 CC (' + fmt$(mo2026) + '/mo)',
-                '+' + fmt$(mo2026 * 0.1230) + '/mo',
-                `<strong>+${fmt$(mo2026 * 0.1830)}/mo</strong>`,
-                '+' + fmt$(mo2026 * 0.2480) + '/mo'],
-            ['5-Year Special Assessments (Per Unit)',
-                `<span class="neg">${fmt$(sim1.totalAssess * u)}</span>`,
-                `<span class="pos">${fmt$(sim2a.totalAssess * u)}</span>`,
-                `<span class="pos">${fmt$(sim2b.totalAssess * u)}</span>`],
-            ['5-Year All-In Out-of-Pocket (Per Unit)',
+            ['2027 Monthly CC (Locked · +12.30% Op)',
+                fmt$(mo2027) + '/mo',
+                `<strong>${fmt$(mo2027)}/mo</strong>`,
+                fmt$(mo2027) + '/mo'],
+            ['2028 CC Increase (3.0% Op + Reserve)',
+                `+3.0%`,
+                `<span class="pos">+9.0%</span>`,
+                `+15.5%`],
+            ['2028 New Monthly Common Charge',
+                fmt$(mo2027 * 1.03) + '/mo',
+                `<strong>${fmt$(mo2027 * 1.09)}/mo</strong>`,
+                fmt$(mo2027 * 1.155) + '/mo'],
+            ['2028–2031 Special Assessments (Per Unit)',
+                `<span class="neg">${fmt$(sim1.assess28to31 * u)}</span>`,
+                `<span class="pos">${fmt$(sim2a.assess28to31 * u)}</span>`,
+                `<span class="pos">${fmt$(sim2b.assess28to31 * u)}</span>`],
+            ['5-Year All-In Out-of-Pocket (2027–31)',
                 fmt$(sim1.totalAllInBuilding * u),
                 `<strong>${fmt$(sim2a.totalAllInBuilding * u)}</strong>`,
                 fmt$(sim2b.totalAllInBuilding * u)],
