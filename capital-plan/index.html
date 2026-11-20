@@ -814,7 +814,7 @@
             <div class="card-header">
                 <div>
                     <div class="card-title">2. Interactive 5-Year Simulator: 2027 Fixed (+12.30% Op) → 2028 Reserve Phase-In</div>
-                    <div class="card-subtitle">2027 is locked at +12.30% operating-only ($0 reserve) · Choose whether to stay pay-as-you-go or phase in a Capital Reserve line starting January 2028</div>
+                    <div class="card-subtitle">2027 is locked at +12.30% operating-only ($0 reserve) · Smoothed 2028–2030 pacing spreads $200k of sealants out of 2028 so reserves aren't over-collected</div>
                 </div>
             </div>
 
@@ -824,7 +824,7 @@
                     <div class="btn-group">
                         <button class="btn-toggle" id="btnOpt1" onclick="setState('strategy','opt1')">Opt 1: Pay-As-You-Go (+0% Res)</button>
                         <button class="btn-toggle active-blue" id="btnOpt2a" onclick="setState('strategy','opt2a')">Opt 2A: Phased Reserve (+6.0% in 2028)</button>
-                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Zero Assessments (+19.3% in 2028)</button>
+                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Zero Assessments (+13.9% in 2028)</button>
                     </div>
                 </div>
 
@@ -898,7 +898,7 @@
                                 <th>Comparison Metric (Selected Unit &amp; Scope)</th>
                                 <th>Opt 1: Pay-As-You-Go<br><span style="font-weight:500;text-transform:none">(+0.0% Reserve)</span></th>
                                 <th>Opt 2A: Phased Reserve<br><span style="font-weight:500;text-transform:none">(+6.0% Reserve · Rec.)</span></th>
-                                <th>Opt 2B: Zero Assessments<br><span id="hdrOpt2bSub" style="font-weight:500;text-transform:none">(+19.3% in 2028)</span></th>
+                                <th>Opt 2B: Zero Assessments<br><span id="hdrOpt2bSub" style="font-weight:500;text-transform:none">(+13.9% in 2028)</span></th>
                             </tr>
                         </thead>
                         <tbody id="compTableBody"></tbody>
@@ -1023,8 +1023,8 @@
         reserveFloor: 1000000,
         interestRate: 0.04,
         years: ['2027', '2028', '2029', '2030', '2031'],
-        capFull: [779454, 755501, 498605, 233177, 500773], // Total: $2,767,510
-        capMand: [586390, 610000, 120000, 110000, 119577], // Total: $1,545,967 (Tier 1 Mandatory)
+        capFull: [779454, 555501, 548605, 383177, 500773], // Total: $2,767,510 (paced: $200k sealants spread 2028 -> 2029-30)
+        capMand: [586390, 410000, 220000, 210000, 119577], // Total: $1,545,967 (Tier 1 Mandatory, paced 2028 -> 2029-30)
         units: {
             '1br': { label: '1-BR Unit', share: 0.003760 }, // ~$1,037/mo 2026 CC
             'avg': { label: 'Avg Unit',  share: 0.004017 }, // ~$1,108/mo 2026 CC
@@ -1098,23 +1098,23 @@
     const ASSESS_REASONS = {
         full: [
             ['2027 Drivers ($779k total; $355k paid by reserve cushion):', '• 2nd-Fl Skylight Leak ($187k) & 53rd St Sidewalk ($154k)', '• 1979 Electrical/Heaters ($145k), Carpets ($94k), Security ($40k)'],
-            ['2028 Drivers ($756k total):', '• Boiler Dual-Fuel Gas Conversion & Liner ($490k)', '• Exterior Window/AC Sealants ($160k) & PE-1 Elevator ($30k)'],
-            ['2029 Drivers ($499k total):', '• Emergency Backup Generator ($325k)', '• 2nd-Floor Courtyard Deck & PE-2 Elevator ($31k)'],
-            ['2030 Drivers ($233k total):', '• Smart Video Intercom ($54k) & Locker Rooms', '• PE-3 Elevator Controller ($32k) & Amenity Upkeep'],
+            ['2028 Drivers ($556k paced; $200k sealants moved to 2029–30):', '• Boiler Dual-Fuel Gas Conversion & Liner ($490k)', '• PE-1 Elevator Controller ($30k) & Phase 1 Sealants'],
+            ['2029 Drivers ($549k total):', '• Emergency Backup Generator ($325k) & 2nd-Fl Deck', '• Exterior Sealants ($50k shifted) & PE-2 Elevator ($31k)'],
+            ['2030 Drivers ($383k total):', '• Exterior Sealants ($150k shifted) & Smart Intercom ($54k)', '• Locker Rooms & PE-3 Elevator Controller ($32k)'],
             ['2031 Drivers ($501k total):', '• Elevator Traction Hoists ($156k) & Booster Pumps ($22k)', '• Phased Corridor Refinishing & Gym Updates']
         ],
         mand: [
             ['2027 Mandatory Drivers ($586k; $355k paid by cushion):', '• 2nd-Fl Skylight ($187k), 53rd St Sidewalk ($154k)', '• 1979 Electrical/Heaters ($145k), LL97 ($35k), FDNY ($31k)'],
-            ['2028 Mandatory Drivers ($610k total):', '• Boiler Dual-Fuel Gas Conversion & Liner ($490k)', '• Exterior Sealants ($90k) & PE-1 Elevator ($30k)'],
-            ['2029 Mandatory Drivers ($120k total):', '• PE-2 Elevator Controller ($31k) & Exterior Sealants'],
-            ['2030 Mandatory Drivers ($110k total):', '• PE-3 Elevator Controller ($32k) & Core Mechanical'],
+            ['2028 Mandatory Drivers ($410k paced):', '• Boiler Dual-Fuel Gas Conversion (Phase 1) & PE-1 Elevator ($30k)'],
+            ['2029 Mandatory Drivers ($220k total):', '• Boiler/Chimney Completion & Exterior Sealants ($100k shifted)', '• PE-2 Elevator Controller ($31k)'],
+            ['2030 Mandatory Drivers ($210k total):', '• Exterior Sealants ($100k shifted) & PE-3 Elevator ($32k)'],
             ['2031 Mandatory Drivers ($120k total):', '• Elevator Hoist Machines & Booster/Fuel Pumps ($22k)']
         ]
     };
 
     function getOpt2bPct() {
-        // Exact minimum 2028 reserve % that keeps 2028-2031 assessments at $0
-        return state.scope === 'full' ? 19.3 : 15.4;
+        // Exact minimum 2028 reserve % for $0 assessments (2028-31) with paced 2028-30 schedule
+        return state.scope === 'full' ? 13.9 : 10.0;
     }
 
     let lastSim1 = null;
