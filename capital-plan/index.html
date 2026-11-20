@@ -824,7 +824,7 @@
                     <div class="btn-group">
                         <button class="btn-toggle" id="btnOpt1" onclick="setState('strategy','opt1')">Opt 1: Pay-As-You-Go (+0% Res)</button>
                         <button class="btn-toggle active-blue" id="btnOpt2a" onclick="setState('strategy','opt2a')">Opt 2A: Phased Reserve (+6.0% in 2028)</button>
-                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Full Reserve (+12.5% in 2028)</button>
+                        <button class="btn-toggle" id="btnOpt2b" onclick="setState('strategy','opt2b')">Opt 2B: Zero Assessments (+19.3% in 2028)</button>
                     </div>
                 </div>
 
@@ -880,7 +880,7 @@
                 <div class="two-col" style="margin-bottom:1.25rem">
                     <div>
                         <div style="font-size:0.84rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem">Annual Special Assessments per Unit (2027–2031)</div>
-                        <div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.6rem">Pay-As-You-Go spikes vs. selected reserve strategy</div>
+                        <div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:0.6rem">Hover any bar to see the specific capital projects driving that year's assessment</div>
                         <div class="chart-wrap"><canvas id="assessChart"></canvas></div>
                     </div>
                     <div>
@@ -898,7 +898,7 @@
                                 <th>Comparison Metric (Selected Unit &amp; Scope)</th>
                                 <th>Opt 1: Pay-As-You-Go<br><span style="font-weight:500;text-transform:none">(+0.0% Reserve)</span></th>
                                 <th>Opt 2A: Phased Reserve<br><span style="font-weight:500;text-transform:none">(+6.0% Reserve · Rec.)</span></th>
-                                <th>Opt 2B: Full Reserve<br><span style="font-weight:500;text-transform:none">(+12.5% Reserve)</span></th>
+                                <th>Opt 2B: Zero Assessments<br><span id="hdrOpt2bSub" style="font-weight:500;text-transform:none">(+19.3% in 2028)</span></th>
                             </tr>
                         </thead>
                         <tbody id="compTableBody"></tbody>
@@ -1095,15 +1095,48 @@
     let assessChart = null;
     let reserveChart = null;
 
+    const ASSESS_REASONS = {
+        full: [
+            ['2027 Drivers ($779k total; $355k paid by reserve cushion):', '• 2nd-Fl Skylight Leak ($187k) & 53rd St Sidewalk ($154k)', '• 1979 Electrical/Heaters ($145k), Carpets ($94k), Security ($40k)'],
+            ['2028 Drivers ($756k total):', '• Boiler Dual-Fuel Gas Conversion & Liner ($490k)', '• Exterior Window/AC Sealants ($160k) & PE-1 Elevator ($30k)'],
+            ['2029 Drivers ($499k total):', '• Emergency Backup Generator ($325k)', '• 2nd-Floor Courtyard Deck & PE-2 Elevator ($31k)'],
+            ['2030 Drivers ($233k total):', '• Smart Video Intercom ($54k) & Locker Rooms', '• PE-3 Elevator Controller ($32k) & Amenity Upkeep'],
+            ['2031 Drivers ($501k total):', '• Elevator Traction Hoists ($156k) & Booster Pumps ($22k)', '• Phased Corridor Refinishing & Gym Updates']
+        ],
+        mand: [
+            ['2027 Mandatory Drivers ($586k; $355k paid by cushion):', '• 2nd-Fl Skylight ($187k), 53rd St Sidewalk ($154k)', '• 1979 Electrical/Heaters ($145k), LL97 ($35k), FDNY ($31k)'],
+            ['2028 Mandatory Drivers ($610k total):', '• Boiler Dual-Fuel Gas Conversion & Liner ($490k)', '• Exterior Sealants ($90k) & PE-1 Elevator ($30k)'],
+            ['2029 Mandatory Drivers ($120k total):', '• PE-2 Elevator Controller ($31k) & Exterior Sealants'],
+            ['2030 Mandatory Drivers ($110k total):', '• PE-3 Elevator Controller ($32k) & Core Mechanical'],
+            ['2031 Mandatory Drivers ($120k total):', '• Elevator Hoist Machines & Booster/Fuel Pumps ($22k)']
+        ]
+    };
+
+    function getOpt2bPct() {
+        // Exact minimum 2028 reserve % that keeps 2028-2031 assessments at $0
+        return state.scope === 'full' ? 19.3 : 15.4;
+    }
+
+    let lastSim1 = null;
+    let lastActiveSim = null;
+
     function updateSimulator() {
         const u = MODEL.units[state.unit].share;
         const capSched = state.scope === 'full' ? MODEL.capFull : MODEL.capMand;
+        const opt2bPct = getOpt2bPct();
+
+        // Sync dynamic Opt 2B labels
+        document.getElementById('btnOpt2b').textContent = `Opt 2B: Zero Assessments (+${opt2bPct.toFixed(1)}% in 2028)`;
+        document.getElementById('hdrOpt2bSub').textContent = `(+${opt2bPct.toFixed(1)}% in 2028)`;
 
         const sim1  = simulate(0.0, capSched);
         const sim2a = simulate(6.0, capSched);
-        const sim2b = simulate(12.5, capSched);
+        const sim2b = simulate(opt2bPct, capSched);
         const activeSim = state.strategy === 'opt1' ? sim1 : (state.strategy === 'opt2a' ? sim2a : sim2b);
-        const activeResPct = RES_PCT[state.strategy];
+        const activeResPct = state.strategy === 'opt1' ? 0.0 : (state.strategy === 'opt2a' ? 6.0 : opt2bPct);
+
+        lastSim1 = sim1;
+        lastActiveSim = activeSim;
 
         const mo2026 = (MODEL.baseCC2026 * u) / 12;
         const mo2027 = ((MODEL.baseCC2026 + MODEL.opGap2027) * u) / 12;
@@ -1150,15 +1183,15 @@
             ['2028 CC Increase (3.0% Op + Reserve)',
                 `+3.0%`,
                 `<span class="pos">+9.0%</span>`,
-                `+15.5%`],
+                `+${(3.0 + opt2bPct).toFixed(1)}%`],
             ['2028 New Monthly Common Charge',
                 fmt$(mo2027 * 1.03) + '/mo',
                 `<strong>${fmt$(mo2027 * 1.09)}/mo</strong>`,
-                fmt$(mo2027 * 1.155) + '/mo'],
+                fmt$(mo2027 * (1 + (3.0 + opt2bPct)/100)) + '/mo'],
             ['2028–2031 Special Assessments (Per Unit)',
                 `<span class="neg">${fmt$(sim1.assess28to31 * u)}</span>`,
                 `<span class="pos">${fmt$(sim2a.assess28to31 * u)}</span>`,
-                `<span class="pos">${fmt$(sim2b.assess28to31 * u)}</span>`],
+                `<span class="pos">$0 (Zero!)</span>`],
             ['5-Year All-In Out-of-Pocket (2027–31)',
                 fmt$(sim1.totalAllInBuilding * u),
                 `<strong>${fmt$(sim2a.totalAllInBuilding * u)}</strong>`,
@@ -1199,7 +1232,28 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { position: 'top', align: 'end', labels: { boxWidth: 11, font: { family: 'Inter', size: 11 } } },
-                        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.y.toLocaleString()}` } }
+                        tooltip: {
+                            backgroundColor: '#0F172A',
+                            padding: 11,
+                            titleFont: { family: 'Inter', size: 12, weight: '700' },
+                            bodyFont: { family: 'Inter', size: 11.5 },
+                            callbacks: {
+                                label: c => {
+                                    const val = c.parsed.y;
+                                    const bldg = c.datasetIndex === 0 ? lastSim1.assessments[c.dataIndex] : lastActiveSim.assessments[c.dataIndex];
+                                    if (val < 1) return ` ${c.dataset.label}: $0 (Fully covered by Reserve)`;
+                                    return ` ${c.dataset.label}: $${val.toLocaleString()}/unit (Bldg shortfall: $${Math.round(bldg/1000).toLocaleString()}k)`;
+                                },
+                                afterBody: items => {
+                                    if (!items.length) return [];
+                                    const idx = items[0].dataIndex;
+                                    const hasAssess = items.some(it => it.parsed.y > 0);
+                                    if (!hasAssess) return ['', '✓ Reserve + interest cover all capital projects this year'];
+                                    const lines = ASSESS_REASONS[state.scope][idx] || [];
+                                    return ['', ...lines];
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { callback: v => '$' + v.toLocaleString(), font: { size: 11 } } },
